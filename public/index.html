@@ -1,0 +1,403 @@
+<!doctype html>
+<html lang="de-CH">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Funkwetter – Solar-terrestrische Daten</title>
+  <meta name="description" content="Aktuelle solar-terrestrische Daten für Funkamateure: Solarflux, Sonnenflecken, A- und K-Index, Röntgenfluss, Sonnenwind, KW- und VHF-Ausbreitungsbedingungen.">
+  <meta name="theme-color" content="#c891fa">
+  <link rel="icon" href="favicon.svg" type="image/svg+xml">
+  <link rel="preload" href="fonts/league-gothic-400.woff2" as="font" type="font/woff2" crossorigin>
+  <link rel="stylesheet" href="styles.css">
+  <script src="i18n.js" defer></script>
+  <script src="app.js" defer></script>
+</head>
+<body>
+  <a class="skip-link" href="#werte" data-i18n="skip">Zum Inhalt springen</a>
+
+  <header class="site-header">
+    <div class="site-header__inner">
+      <a class="brand" href="#top" data-i18n-aria="brand.label" aria-label="Funkwetter – zum Seitenanfang">
+        <span class="brand__solid" data-i18n="brand.a">Funk</span>
+        <span class="brand__outline"><span data-i18n="brand.b">Wetter</span><small data-i18n="brand.sub">KW · VHF · Sonne</small></span>
+      </a>
+      <div class="site-header__end">
+        <nav class="site-nav" id="site-nav" data-i18n-aria="nav.label" aria-label="Hauptnavigation">
+          <a href="#werte" data-i18n="nav.values">Werte</a>
+          <a href="#baender" data-i18n="nav.bands">KW-Bänder</a>
+          <a href="#vhf" data-i18n="nav.vhf">VHF</a>
+          <a href="#skalen" data-i18n="nav.scales">NOAA-Skalen</a>
+          <a href="#verlauf" data-i18n="nav.history">Verlauf</a>
+          <a href="#sonne" data-i18n="nav.images">Bilder</a>
+          <a href="#erklaerungen" data-i18n="nav.glossary">Erklärungen</a>
+        </nav>
+        <div class="lang-switch" role="group" data-i18n-aria="lang.label" aria-label="Sprache">
+          <button type="button" data-set-lang="de" lang="de" aria-pressed="true">DE</button>
+          <button type="button" data-set-lang="en" lang="en" aria-pressed="false">EN</button>
+        </div>
+        <button class="nav-toggle" type="button" aria-expanded="false" aria-controls="site-nav">
+          <span class="visually-hidden" data-i18n="nav.menu">Menü</span>
+          <span class="nav-toggle__bar"></span><span class="nav-toggle__bar"></span><span class="nav-toggle__bar"></span>
+        </button>
+      </div>
+    </div>
+  </header>
+
+  <main id="top">
+    <section class="hero bg-purple">
+      <div class="layout">
+        <h1 class="hero__title" data-i18n-html="hero.title">Sonne, Ionosphäre <br>&amp; Funkbedingungen</h1>
+        <p class="hero__lead" data-i18n="hero.lead">Solar-terrestrische Daten für Funkamateure – Solarflux, Sonnenflecken, geomagnetische Indizes, Röntgenfluss, Sonnenwind und die daraus berechneten Ausbreitungsbedingungen auf Kurzwelle und VHF.</p>
+        <p class="hero__meta" id="hero-meta" aria-live="polite" data-i18n="loading">Daten werden geladen …</p>
+      </div>
+    </section>
+
+    <div class="ticker bg-yellow" aria-hidden="true">
+      <div class="ticker__track" id="ticker"><span class="ticker__item" data-i18n="loading.ticker">Lade aktuelle Werte …</span></div>
+    </div>
+
+    <div class="notice layout" id="notice" role="status" hidden></div>
+
+    <!-- Aktuelle Werte -->
+    <section class="section" id="werte" aria-labelledby="werte-title">
+      <div class="layout">
+        <h2 class="headline" id="werte-title" data-i18n="values.title">Aktuelle Werte</h2>
+        <p class="section__intro" id="werte-intro" data-i18n="values.intro">Quelle: N0NBH / hamqsl.com.</p>
+        <div class="boxes" id="indices">
+          <div class="placeholder" data-i18n="loading">Daten werden geladen …</div>
+        </div>
+      </div>
+    </section>
+
+    <!-- KW-Bänder -->
+    <section class="section bg-orange" id="baender" aria-labelledby="baender-title">
+      <div class="layout">
+        <h2 class="headline" id="baender-title" data-i18n="bands.title">KW-Bandbedingungen</h2>
+        <p class="section__intro" data-i18n="bands.intro">Von N0NBH berechnete Ausbreitungsbedingungen.</p>
+        <div class="split">
+          <div class="table-wrap">
+            <table class="band-table" id="band-table">
+              <thead>
+                <tr><th scope="col" data-i18n="bands.band">Band</th><th scope="col" data-i18n="bands.day">Tag</th><th scope="col" data-i18n="bands.night">Nacht</th></tr>
+              </thead>
+              <tbody><tr><td colspan="3" data-i18n="loading">Daten werden geladen …</td></tr></tbody>
+            </table>
+          </div>
+          <dl class="facts" id="hf-facts"></dl>
+        </div>
+      </div>
+    </section>
+
+    <!-- VHF -->
+    <section class="section bg-cyan" id="vhf" aria-labelledby="vhf-title">
+      <div class="layout">
+        <h2 class="headline" id="vhf-title" data-i18n="vhf.title">VHF-Bedingungen</h2>
+        <p class="section__intro" data-i18n="vhf.intro">Polarlicht (Aurora) und sporadische E-Schicht (E-Skip) – berechnet von N0NBH.</p>
+        <ul class="vhf-list" id="vhf-list"><li data-i18n="loading">Daten werden geladen …</li></ul>
+      </div>
+    </section>
+
+    <!-- NOAA-Skalen -->
+    <section class="section" id="skalen" aria-labelledby="skalen-title">
+      <div class="layout">
+        <h2 class="headline" id="skalen-title" data-i18n="scales.title">NOAA-Weltraumwetter-Skalen</h2>
+        <p class="section__intro" data-i18n="scales.intro">R, S und G, Stufe 0 bis 5.</p>
+        <div class="scales" id="scales-now"></div>
+        <div class="table-wrap">
+          <table class="forecast-table" id="scales-forecast">
+            <caption data-i18n="scales.caption">Prognose NOAA SWPC</caption>
+            <thead>
+              <tr>
+                <th scope="col" data-i18n="scales.day">Tag</th>
+                <th scope="col">R1–R2 <span class="th-sub" data-i18n="scales.prob">Wahrsch.</span></th>
+                <th scope="col">R3–R5 <span class="th-sub" data-i18n="scales.prob">Wahrsch.</span></th>
+                <th scope="col">S1+ <span class="th-sub" data-i18n="scales.prob">Wahrsch.</span></th>
+                <th scope="col">G <span class="th-sub" data-i18n="scales.expected">erwartet</span></th>
+              </tr>
+            </thead>
+            <tbody></tbody>
+          </table>
+        </div>
+      </div>
+    </section>
+
+    <!-- Verlauf -->
+    <section class="section bg-purple" id="verlauf" aria-labelledby="verlauf-title">
+      <div class="layout">
+        <h2 class="headline" id="verlauf-title" data-i18n="history.title">Verlauf</h2>
+        <p class="section__intro" data-i18n="history.intro">Messwerte von NOAA SWPC. Zeiten in UTC.</p>
+        <div class="charts">
+          <figure class="chart-card chart-card--wide">
+            <figcaption><h3 data-i18n="chart.kp.title">Planetarer K-Index</h3><span id="kp-caption" data-i18n="chart.kp.caption">Beobachtet, geschätzt und Prognose (3-Stunden-Werte)</span></figcaption>
+            <div class="chart" id="chart-kp" role="img" data-i18n-aria="chart.kp.aria" aria-label="Balkendiagramm des planetaren K-Index"></div>
+            <ul class="legend">
+              <li><span class="swatch swatch--good"></span><span data-i18n="legend.kp03">Kp 0–3</span></li>
+              <li><span class="swatch swatch--ok"></span><span data-i18n="legend.kp4">Kp 4</span></li>
+              <li><span class="swatch swatch--warn"></span><span data-i18n="legend.kp56">Kp 5–6 (G1–G2)</span></li>
+              <li><span class="swatch swatch--bad"></span><span data-i18n="legend.kp7">Kp 7+ (G3+)</span></li>
+              <li><span class="swatch swatch--pred"></span><span data-i18n="legend.pred">Prognose</span></li>
+            </ul>
+          </figure>
+          <figure class="chart-card chart-card--wide">
+            <figcaption><h3 data-i18n="chart.xray.title">Röntgenfluss (GOES)</h3><span id="xray-caption" data-i18n="chart.xray.caption">Band 0,1–0,8 nm, letzte 24 Stunden, logarithmisch, W/m²</span></figcaption>
+            <div class="chart" id="chart-xray" role="img" data-i18n-aria="chart.xray.aria" aria-label="Liniendiagramm des Röntgenflusses der letzten 24 Stunden"></div>
+          </figure>
+          <figure class="chart-card">
+            <figcaption><h3 data-i18n="chart.wind.title">Sonnenwind-Geschwindigkeit</h3><span id="wind-caption" data-i18n="chart.wind.caption">Letzte 24 Stunden, km/s</span></figcaption>
+            <div class="chart" id="chart-wind" role="img" data-i18n-aria="chart.wind.aria" aria-label="Liniendiagramm der Sonnenwind-Geschwindigkeit"></div>
+          </figure>
+          <figure class="chart-card">
+            <figcaption><h3 data-i18n="chart.mag.title">Interplanetares Magnetfeld</h3><span id="mag-caption" data-i18n="chart.mag.caption">Bz (GSM) und Bt, letzte 24 Stunden, nT</span></figcaption>
+            <div class="chart" id="chart-mag" role="img" data-i18n-aria="chart.mag.aria" aria-label="Liniendiagramm von Bz und Bt"></div>
+            <ul class="legend">
+              <li><span class="swatch swatch--line"></span>Bz</li>
+              <li><span class="swatch swatch--line-muted"></span>Bt</li>
+              <li><span class="swatch swatch--south"></span><span data-i18n="chart.mag.south">Bz südwärts</span></li>
+            </ul>
+          </figure>
+        </div>
+      </div>
+    </section>
+
+    <!-- Bilder -->
+    <section class="section" id="sonne" aria-labelledby="sonne-title">
+      <div class="layout">
+        <h2 class="headline" id="sonne-title" data-i18n="images.title">Die Sonne jetzt</h2>
+        <p class="section__intro" data-i18n="images.intro">Aktuelle Aufnahmen.</p>
+        <div class="gallery" id="gallery">
+          <div class="placeholder" data-i18n="images.loading">Bilder werden geladen …</div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Erklärungen -->
+    <section class="section bg-cyan section--collapsibles" id="erklaerungen" aria-labelledby="erklaerungen-title">
+      <div class="layout">
+        <h2 class="headline" id="erklaerungen-title" data-i18n="glossary.title">Erklärungen</h2>
+      </div>
+
+      <!-- ======================= Deutsch ======================= -->
+      <div class="collapsibles" data-lang="de">
+        <details class="collapsible">
+          <summary><span class="layout">Solarflux (SFI) &amp; Sonnenflecken (SN)</span></summary>
+          <div class="layout collapsible__body">
+            <p>Der <strong>Solarflux-Index</strong> (SFI) ist die Radiostrahlung der Sonne bei 10,7 cm Wellenlänge (2800 MHz), angegeben in Solar Flux Units (sfu) und gemessen in Penticton, Kanada. Er ist ein guter Stellvertreter für die extreme UV-Strahlung, welche die F-Schicht ionisiert: Je höher der Wert, desto stärker die Ionisation und desto höher die nutzbaren Frequenzen. Die oberen KW-Bänder (17 m bis 10 m) öffnen sich vor allem bei hohem Solarflux.</p>
+            <p>Die <strong>Sonnenfleckenzahl</strong> (SN) beschreibt Anzahl und Gruppierung der Sonnenflecken. Sie folgt dem etwa elfjährigen Sonnenzyklus und hängt eng mit dem Solarflux zusammen.</p>
+            <table class="mini-table">
+              <thead><tr><th>SFI</th><th>Faustregel für KW</th></tr></thead>
+              <tbody>
+                <tr><td>unter 70</td><td>Schwach – obere Bänder meist geschlossen</td></tr>
+                <tr><td>70–99</td><td>Mässig</td></tr>
+                <tr><td>100–149</td><td>Gut</td></tr>
+                <tr><td>ab 150</td><td>Sehr gut – 10 m häufig offen</td></tr>
+              </tbody>
+            </table>
+          </div>
+        </details>
+        <details class="collapsible">
+          <summary><span class="layout">A-Index &amp; K-Index</span></summary>
+          <div class="layout collapsible__body">
+            <p>Der <strong>K-Index</strong> (0–9) beschreibt die Störung der Horizontalkomponente des Erdmagnetfelds in einem 3-Stunden-Intervall auf einer quasi-logarithmischen Skala. Angezeigt wird der planetare Wert (Kp), ein Mittel aus mehreren Observatorien. Der <strong>A-Index</strong> ist ein linearer Tagesmittelwert derselben Aktivität, gebildet aus acht 3-Stunden-Werten. Niedrige Werte bedeuten ein ruhiges Magnetfeld und stabile Ausbreitung; hohe Werte führen zu Absorption, Fading und geschlossenen Bändern, besonders auf polnahen Pfaden.</p>
+            <div class="mini-tables">
+              <table class="mini-table">
+                <thead><tr><th>K</th><th>Zustand</th></tr></thead>
+                <tbody>
+                  <tr><td>0–2</td><td>Ruhig</td></tr>
+                  <tr><td>3</td><td>Unruhig</td></tr>
+                  <tr><td>4</td><td>Aktiv</td></tr>
+                  <tr><td>5</td><td>Sturm G1 (gering)</td></tr>
+                  <tr><td>6</td><td>Sturm G2 (mässig)</td></tr>
+                  <tr><td>7</td><td>Sturm G3 (stark)</td></tr>
+                  <tr><td>8</td><td>Sturm G4 (schwer)</td></tr>
+                  <tr><td>9</td><td>Sturm G5 (extrem)</td></tr>
+                </tbody>
+              </table>
+              <table class="mini-table">
+                <thead><tr><th>A</th><th>Zustand</th></tr></thead>
+                <tbody>
+                  <tr><td>0–7</td><td>Ruhig</td></tr>
+                  <tr><td>8–15</td><td>Unruhig</td></tr>
+                  <tr><td>16–29</td><td>Aktiv</td></tr>
+                  <tr><td>30–49</td><td>Kleiner Sturm</td></tr>
+                  <tr><td>50–99</td><td>Grosser Sturm</td></tr>
+                  <tr><td>ab 100</td><td>Schwerer Sturm</td></tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </details>
+        <details class="collapsible">
+          <summary><span class="layout">Röntgenfluss &amp; Flares</span></summary>
+          <div class="layout collapsible__body">
+            <p>Der Röntgenfluss der Sonne wird von GOES-Satelliten im Band 0,1–0,8 nm gemessen und in die Klassen A, B, C, M und X eingeteilt. Jede Klasse ist zehnmal stärker als die vorhergehende (A1 = 10⁻⁸ W/m², X1 = 10⁻⁴ W/m²). Starke Flares ionisieren die D-Schicht auf der Tagseite der Erde und verursachen <strong>Kurzwellen-Ausfälle</strong> (Mögel-Dellinger-Effekt), die von Minuten bis Stunden dauern können.</p>
+            <table class="mini-table">
+              <thead><tr><th>Klasse</th><th>NOAA-Skala</th><th>Auswirkung auf KW (Tagseite)</th></tr></thead>
+              <tbody>
+                <tr><td>A, B, C</td><td>–</td><td>Keine oder kaum spürbar</td></tr>
+                <tr><td>M1</td><td>R1 (gering)</td><td>Leichte Beeinträchtigung, gelegentlicher Verbindungsverlust</td></tr>
+                <tr><td>M5</td><td>R2 (mässig)</td><td>Begrenzter Ausfall, Verbindungsverlust für einige Dutzend Minuten</td></tr>
+                <tr><td>X1</td><td>R3 (stark)</td><td>Grossflächiger Ausfall, etwa eine Stunde</td></tr>
+                <tr><td>X10</td><td>R4 (schwer)</td><td>Ausfall auf dem Grossteil der Tagseite, ein bis zwei Stunden</td></tr>
+                <tr><td>X20</td><td>R5 (extrem)</td><td>Vollständiger Ausfall auf der ganzen Tagseite, mehrere Stunden</td></tr>
+              </tbody>
+            </table>
+          </div>
+        </details>
+        <details class="collapsible">
+          <summary><span class="layout">Sonnenwind &amp; interplanetares Magnetfeld</span></summary>
+          <div class="layout collapsible__body">
+            <p>Der <strong>Sonnenwind</strong> ist ein Strom geladener Teilchen von der Sonne, typischerweise 300–500 km/s schnell. Schnelle Ströme aus koronalen Löchern erreichen 500–800 km/s, koronale Massenauswürfe (CME) teils deutlich mehr. Gemessen wird er von Raumsonden am Lagrange-Punkt L1, etwa 1,5 Millionen km vor der Erde.</p>
+            <p><strong>Bz</strong> ist die Nord-Süd-Komponente des interplanetaren Magnetfelds (im GSM-Koordinatensystem), <strong>Bt</strong> dessen Gesamtstärke. Zeigt Bz längere Zeit nach Süden (negative Werte), koppelt der Sonnenwind effizient an das Erdmagnetfeld: Geomagnetische Stürme und Polarlichter werden wahrscheinlicher, die KW-Ausbreitung verschlechtert sich, VHF-Aurora-Verbindungen werden möglich.</p>
+          </div>
+        </details>
+        <details class="collapsible">
+          <summary><span class="layout">Bandbedingungen &amp; Grenzfrequenzen</span></summary>
+          <div class="layout collapsible__body">
+            <p>Die Bandbedingungen werden von N0NBH aus Solarflux, Sonnenflecken, geomagnetischer Aktivität (K-Index, Aurora, Sonnenwind, Bz) sowie Röntgen- und Protonenfluss <strong>berechnet</strong> – es sind keine Messungen. Sie zeigen eine allgemeine Tendenz für Tag und Nacht: <em>Gut</em>, <em>Mittel</em> oder <em>Schlecht</em>.</p>
+            <p><strong>foF2</strong> ist die kritische Frequenz der F2-Schicht – die höchste Frequenz, die bei senkrechtem Einfall noch reflektiert wird. Die <strong>MUF</strong> (Maximum Usable Frequency) ist die höchste nutzbare Frequenz für eine bestimmte Strecke; für 3000 km liegt sie typischerweise beim 2,5- bis 3,5-Fachen von foF2. Beide Werte stammen von Ionosonden; «Keine Meldung» bedeutet, dass aktuell kein Messwert vorliegt.</p>
+            <p>Der <strong>Störpegel</strong> ist eine Schätzung des Rauschens in S-Stufen, das durch die Wechselwirkung von Sonnenwind und Erdmagnetfeld entsteht. Er wird aus der geomagnetischen Aktivität (K-Index) abgeleitet.</p>
+          </div>
+        </details>
+        <details class="collapsible">
+          <summary><span class="layout">VHF: Aurora &amp; E-Skip</span></summary>
+          <div class="layout collapsible__body">
+            <p>Bei starker geomagnetischer Aktivität können VHF-Signale an Polarlichtern gestreut werden (<strong>Aurora-Ausbreitung</strong>), typisch mit rauem, zischendem Klang. N0NBH unterscheidet Aurora in hohen Breiten (über 60° N) und mittleren Breiten (30–60° N).</p>
+            <p>Die <strong>sporadische E-Schicht</strong> (Es) tritt in Europa vor allem von Mai bis August auf. Sie ermöglicht Verbindungen über typischerweise 1000–2000 km (bei einem Sprung bis etwa 2300 km) auf 6 m und 4 m, seltener auch auf 2 m.</p>
+          </div>
+        </details>
+        <details class="collapsible">
+          <summary><span class="layout">Weitere Werte</span></summary>
+          <div class="layout collapsible__body">
+            <p><strong>304 Å</strong>: Relative Stärke der extremen UV-Strahlung bei 30,4 nm, ausgesandt vor allem von ionisiertem Helium (He II). Sie trägt wesentlich zur Ionisation der F-Schicht bei.</p>
+            <p><strong>Protonen- und Elektronenfluss</strong>: Flüsse energiereicher Teilchen. Hohe Protonenflüsse verursachen Absorption über den Polkappen (Polar Cap Absorption, PCA) und schliessen polare KW-Pfade.</p>
+            <p><strong>Aurora</strong>: Polarlicht-Aktivität, von N0NBH aus der hemisphärischen Leistung (0–150 GW) berechnet und auf eine Skala ab 0 umgerechnet. Die angegebene Breite ist die geschätzte tiefste Breite, die vom Polarlicht betroffen ist.</p>
+          </div>
+        </details>
+      </div>
+
+      <!-- ======================= English ======================= -->
+      <div class="collapsibles" data-lang="en">
+        <details class="collapsible">
+          <summary><span class="layout">Solar flux (SFI) &amp; sunspot number (SN)</span></summary>
+          <div class="layout collapsible__body">
+            <p>The <strong>solar flux index</strong> (SFI) is the Sun's radio emission at a wavelength of 10.7 cm (2800 MHz), given in solar flux units (sfu) and measured at Penticton, Canada. It is a good proxy for the extreme UV radiation that ionises the F layer: the higher the value, the stronger the ionisation and the higher the usable frequencies. The upper HF bands (17 m to 10 m) open mainly when the solar flux is high.</p>
+            <p>The <strong>sunspot number</strong> (SN) describes the number and grouping of sunspots. It follows the roughly eleven-year solar cycle and correlates closely with the solar flux.</p>
+            <table class="mini-table">
+              <thead><tr><th>SFI</th><th>Rule of thumb for HF</th></tr></thead>
+              <tbody>
+                <tr><td>below 70</td><td>Low – upper bands mostly closed</td></tr>
+                <tr><td>70–99</td><td>Fair</td></tr>
+                <tr><td>100–149</td><td>Good</td></tr>
+                <tr><td>150 and above</td><td>Very good – 10 m often open</td></tr>
+              </tbody>
+            </table>
+          </div>
+        </details>
+        <details class="collapsible">
+          <summary><span class="layout">A-index &amp; K-index</span></summary>
+          <div class="layout collapsible__body">
+            <p>The <strong>K-index</strong> (0–9) describes the disturbance of the horizontal component of the Earth's magnetic field during a 3-hour interval on a quasi-logarithmic scale. The planetary value (Kp), averaged from several observatories, is shown. The <strong>A-index</strong> is a linear daily average of the same activity, derived from eight 3-hour values. Low values mean a quiet magnetic field and stable propagation; high values cause absorption, fading and closed bands, especially on polar paths.</p>
+            <div class="mini-tables">
+              <table class="mini-table">
+                <thead><tr><th>K</th><th>Condition</th></tr></thead>
+                <tbody>
+                  <tr><td>0–2</td><td>Quiet</td></tr>
+                  <tr><td>3</td><td>Unsettled</td></tr>
+                  <tr><td>4</td><td>Active</td></tr>
+                  <tr><td>5</td><td>Storm G1 (minor)</td></tr>
+                  <tr><td>6</td><td>Storm G2 (moderate)</td></tr>
+                  <tr><td>7</td><td>Storm G3 (strong)</td></tr>
+                  <tr><td>8</td><td>Storm G4 (severe)</td></tr>
+                  <tr><td>9</td><td>Storm G5 (extreme)</td></tr>
+                </tbody>
+              </table>
+              <table class="mini-table">
+                <thead><tr><th>A</th><th>Condition</th></tr></thead>
+                <tbody>
+                  <tr><td>0–7</td><td>Quiet</td></tr>
+                  <tr><td>8–15</td><td>Unsettled</td></tr>
+                  <tr><td>16–29</td><td>Active</td></tr>
+                  <tr><td>30–49</td><td>Minor storm</td></tr>
+                  <tr><td>50–99</td><td>Major storm</td></tr>
+                  <tr><td>100 and above</td><td>Severe storm</td></tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </details>
+        <details class="collapsible">
+          <summary><span class="layout">X-ray flux &amp; flares</span></summary>
+          <div class="layout collapsible__body">
+            <p>The Sun's X-ray flux is measured by GOES satellites in the 0.1–0.8 nm band and divided into classes A, B, C, M and X. Each class is ten times stronger than the previous one (A1 = 10⁻⁸ W/m², X1 = 10⁻⁴ W/m²). Strong flares ionise the D layer on the sunlit side of the Earth and cause <strong>HF radio blackouts</strong> (sudden ionospheric disturbance, Dellinger effect) lasting from minutes to hours.</p>
+            <table class="mini-table">
+              <thead><tr><th>Class</th><th>NOAA scale</th><th>Effect on HF (sunlit side)</th></tr></thead>
+              <tbody>
+                <tr><td>A, B, C</td><td>–</td><td>None or barely noticeable</td></tr>
+                <tr><td>M1</td><td>R1 (minor)</td><td>Weak degradation, occasional loss of radio contact</td></tr>
+                <tr><td>M5</td><td>R2 (moderate)</td><td>Limited blackout, loss of contact for tens of minutes</td></tr>
+                <tr><td>X1</td><td>R3 (strong)</td><td>Wide-area blackout for about an hour</td></tr>
+                <tr><td>X10</td><td>R4 (severe)</td><td>Blackout on most of the sunlit side for one to two hours</td></tr>
+                <tr><td>X20</td><td>R5 (extreme)</td><td>Complete blackout on the entire sunlit side for a number of hours</td></tr>
+              </tbody>
+            </table>
+          </div>
+        </details>
+        <details class="collapsible">
+          <summary><span class="layout">Solar wind &amp; interplanetary magnetic field</span></summary>
+          <div class="layout collapsible__body">
+            <p>The <strong>solar wind</strong> is a stream of charged particles from the Sun, typically travelling at 300–500 km/s. High-speed streams from coronal holes reach 500–800 km/s, coronal mass ejections (CMEs) sometimes considerably more. It is measured by spacecraft at the L1 Lagrange point, about 1.5 million km upstream of the Earth.</p>
+            <p><strong>Bz</strong> is the north-south component of the interplanetary magnetic field (in GSM coordinates), <strong>Bt</strong> its total strength. When Bz points south (negative values) for a prolonged period, the solar wind couples efficiently to the Earth's magnetic field: geomagnetic storms and aurora become more likely, HF propagation degrades and VHF auroral contacts become possible.</p>
+          </div>
+        </details>
+        <details class="collapsible">
+          <summary><span class="layout">Band conditions &amp; critical frequencies</span></summary>
+          <div class="layout collapsible__body">
+            <p>The band conditions are <strong>calculated</strong> by N0NBH from solar flux, sunspots, geomagnetic activity (K-index, aurora, solar wind, Bz) and X-ray and proton flux – they are not measurements. They indicate a general trend for day and night: <em>Good</em>, <em>Fair</em> or <em>Poor</em>.</p>
+            <p><strong>foF2</strong> is the critical frequency of the F2 layer – the highest frequency still reflected at vertical incidence. The <strong>MUF</strong> (maximum usable frequency) is the highest usable frequency for a given path; for 3000 km it is typically 2.5 to 3.5 times foF2. Both values come from ionosondes; "No report" means no reading is currently available.</p>
+            <p><strong>Signal noise</strong> is an estimate, in S-units, of the noise generated by the interaction between the solar wind and the Earth's magnetic field. It is derived from geomagnetic activity (K-index).</p>
+          </div>
+        </details>
+        <details class="collapsible">
+          <summary><span class="layout">VHF: aurora &amp; E-skip</span></summary>
+          <div class="layout collapsible__body">
+            <p>During strong geomagnetic activity, VHF signals can be scattered by the aurora (<strong>auroral propagation</strong>), typically with a rough, hissing tone. N0NBH distinguishes high-latitude aurora (above 60° N) and mid-latitude aurora (30–60° N).</p>
+            <p><strong>Sporadic E</strong> (Es) occurs in Europe mainly from May to August. It allows contacts over typically 1000–2000 km (up to about 2300 km in a single hop) on 6 m and 4 m, and less often on 2 m.</p>
+          </div>
+        </details>
+        <details class="collapsible">
+          <summary><span class="layout">Other values</span></summary>
+          <div class="layout collapsible__body">
+            <p><strong>304 Å</strong>: relative strength of extreme-UV radiation at 30.4 nm, emitted mainly by ionised helium (He II). It contributes significantly to F-layer ionisation.</p>
+            <p><strong>Proton and electron flux</strong>: fluxes of energetic particles. High proton fluxes cause polar cap absorption (PCA) and close polar HF paths.</p>
+            <p><strong>Aurora</strong>: auroral activity, calculated by N0NBH from the hemispheric power (0–150 GW) and converted to a scale starting at 0. The latitude shown is the estimated lowest latitude affected by the aurora.</p>
+          </div>
+        </details>
+      </div>
+    </section>
+  </main>
+
+  <footer class="site-footer">
+    <div class="layout site-footer__grid">
+      <div>
+        <h2 class="site-footer__title" data-i18n="footer.sources">Datenquellen</h2>
+        <ul class="site-footer__list">
+          <li><span data-i18n="footer.src1">Solar-terrestrische Daten und Bandbedingungen:</span> <a href="https://www.hamqsl.com/solar.html" rel="noopener noreferrer">N0NBH – hamqsl.com</a></li>
+          <li><span data-i18n="footer.src2">Kp, Röntgenfluss, Sonnenwind, Skalen, Polarlicht, D-RAP:</span> <a href="https://www.swpc.noaa.gov/" rel="noopener noreferrer">NOAA Space Weather Prediction Center</a></li>
+          <li><span data-i18n="footer.src3">Sonnenbilder:</span> <a href="https://www.swpc.noaa.gov/products/goes-solar-ultraviolet-imager-suvi" rel="noopener noreferrer">NOAA GOES/SUVI</a>, <a href="https://sdo.gsfc.nasa.gov/" rel="noopener noreferrer">NASA/SDO</a> (HMI) <span data-i18n="footer.and">und</span> <a href="https://soho.nascom.nasa.gov/" rel="noopener noreferrer">ESA/NASA SOHO</a> (LASCO)</li>
+        </ul>
+      </div>
+      <div>
+        <h2 class="site-footer__title" data-i18n="footer.status">Stand</h2>
+        <p id="footer-status">–</p>
+        <p class="site-footer__small" data-i18n="footer.note">Die Seite aktualisiert sich alle 5 Minuten automatisch. Alle Angaben ohne Gewähr.</p>
+      </div>
+    </div>
+    <div class="layout site-footer__bottom">
+      <span><span data-i18n="meta.brand">Funkwetter</span> © <span id="year">2026</span></span>
+      <a href="#top" data-i18n="footer.top">Nach oben</a>
+    </div>
+  </footer>
+
+  <div class="tooltip" id="tooltip" role="presentation" hidden></div>
+</body>
+</html>

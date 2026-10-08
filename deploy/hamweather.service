@@ -1,0 +1,57 @@
+# systemd-Dienst für HamWeather / Funkwetter
+# Installation: siehe DEPLOY.md
+#   sudo cp deploy/hamweather.service /etc/systemd/system/
+#   sudo systemctl daemon-reload && sudo systemctl enable --now hamweather
+
+[Unit]
+Description=HamWeather (Funkwetter) – solar-terrestrial data
+After=network-online.target
+Wants=network-online.target
+
+[Service]
+Type=simple
+User=hamweather
+Group=hamweather
+WorkingDirectory=/opt/hamweather
+ExecStart=/usr/bin/node /opt/hamweather/server.js
+Environment=NODE_ENV=production
+Environment=HOST=127.0.0.1
+Environment=PORT=3000
+# Nur mit Reverse-Proxy (Caddy oder cloudflared) davor:
+Environment=TRUST_PROXY=1
+Restart=on-failure
+RestartSec=5
+
+# --- Härtung: der Dienst darf praktisch nichts ausser Netzwerk und Lesen seiner Dateien ---
+NoNewPrivileges=true
+CapabilityBoundingSet=
+AmbientCapabilities=
+ProtectSystem=strict
+ProtectHome=true
+PrivateTmp=true
+PrivateDevices=true
+ProtectKernelTunables=true
+ProtectKernelModules=true
+ProtectKernelLogs=true
+ProtectControlGroups=true
+ProtectClock=true
+ProtectHostname=true
+ProtectProc=invisible
+ProcSubset=pid
+RestrictAddressFamilies=AF_INET AF_INET6 AF_UNIX
+RestrictNamespaces=true
+RestrictRealtime=true
+RestrictSUIDSGID=true
+LockPersonality=true
+SystemCallArchitectures=native
+SystemCallFilter=@system-service
+SystemCallFilter=~@privileged
+UMask=0077
+# Hinweis: MemoryDenyWriteExecute darf bei Node.js NICHT gesetzt werden (JIT-Compiler).
+
+# --- Ressourcen begrenzen ---
+MemoryMax=384M
+TasksMax=64
+
+[Install]
+WantedBy=multi-user.target

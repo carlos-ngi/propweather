@@ -1,0 +1,15 @@
+# Caddy als Reverse-Proxy mit automatischem HTTPS (Let's Encrypt).
+# "wetter.example.ch" durch die eigene Domain ersetzen.
+# Installation: siehe DEPLOY.md  ->  /etc/caddy/Caddyfile
+
+wetter.example.ch {
+	encode zstd gzip
+
+	header {
+		# Browser nur noch per HTTPS verbinden lassen (1 Jahr)
+		Strict-Transport-Security "max-age=31536000; includeSubDomains"
+		-Server
+	}
+
+	reverse_proxy 127.0.0.1:3000
+}
