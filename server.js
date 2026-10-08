@@ -470,9 +470,10 @@ function loadOperator() {
   return {
     example,
     name: text(op.name, 'name'),
-    street: text(op.street, 'street'),
-    postcode: text(op.postcode, 'postcode'),
-    city: text(op.city, 'city'),
+    // Postadresse ist optional: leer lassen, um sie nicht zu veröffentlichen
+    street: op.street ? text(op.street, 'street') : '',
+    postcode: op.postcode ? text(op.postcode, 'postcode') : '',
+    city: op.city ? text(op.city, 'city') : '',
     country: both(op.country, 'country'),
     serverCountry: both(op.serverCountry, 'serverCountry'),
     email,

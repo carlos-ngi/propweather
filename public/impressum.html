@@ -46,8 +46,8 @@
       <h2>Verantwortlich für den Inhalt</h2>
       <address>
         {{name}}<br>
-        {{street}}<br>
-        {{postcode}} {{city}}<br>
+        <!--if:street-->{{street}}<br><!--endif-->
+        <!--if:city-->{{postcode}} {{city}}<br><!--endif-->
         {{country.de}}
       </address>
       <!--if:callsign--><p>Rufzeichen: {{callsign}}</p><!--endif-->
@@ -81,8 +81,8 @@
       <h2>Responsible for the content</h2>
       <address>
         {{name}}<br>
-        {{street}}<br>
-        {{postcode}} {{city}}<br>
+        <!--if:street-->{{street}}<br><!--endif-->
+        <!--if:city-->{{postcode}} {{city}}<br><!--endif-->
         {{country.en}}
       </address>
       <!--if:callsign--><p>Call sign: {{callsign}}</p><!--endif-->

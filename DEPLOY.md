@@ -197,7 +197,8 @@ Die Angaben stehen in [`operator.json`](operator.json):
 
 | Feld | Inhalt |
 | --- | --- |
-| `name`, `street`, `postcode`, `city`, `country` | Name und Postadresse |
+| `name`, `country` | Name und Land |
+| `street`, `postcode`, `city` | Postadresse (optional – leer lassen, um sie nicht anzuzeigen) |
 | `email` | öffentliche Kontaktadresse |
 | `emailViaCloudflare` | `true`, solange die Adresse über Cloudflare Email Routing läuft (steht dann in der Datenschutzerklärung) |
 | `callsign` | Rufzeichen (leer = nicht anzeigen) |

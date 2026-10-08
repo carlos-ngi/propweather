@@ -56,8 +56,8 @@
       <p>Verantwortlich für die Bearbeitung von Personendaten auf dieser Webseite ist:</p>
       <address>
         {{name}}<br>
-        {{street}}<br>
-        {{postcode}} {{city}}<br>
+        <!--if:street-->{{street}}<br><!--endif-->
+        <!--if:city-->{{postcode}} {{city}}<br><!--endif-->
         {{country.de}}<br>
         E-Mail: <a href="mailto:{{email}}">{{email}}</a>
       </address>
@@ -117,8 +117,8 @@
       <p>The controller responsible for processing personal data on this website is:</p>
       <address>
         {{name}}<br>
-        {{street}}<br>
-        {{postcode}} {{city}}<br>
+        <!--if:street-->{{street}}<br><!--endif-->
+        <!--if:city-->{{postcode}} {{city}}<br><!--endif-->
         {{country.en}}<br>
         E-mail: <a href="mailto:{{email}}">{{email}}</a>
       </address>
