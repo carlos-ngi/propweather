@@ -3,9 +3,16 @@
   "street": "Musterstrasse 1",
   "postcode": "8000",
   "city": "Zürich",
-  "country": { "de": "Schweiz", "en": "Switzerland" },
+  "country": {
+    "de": "Schweiz",
+    "en": "Switzerland"
+  },
   "email": "kontakt@example.ch",
+  "emailViaCloudflare": false,
   "callsign": "",
   "hosting": "cloudflare",
-  "serverCountry": { "de": "der Schweiz", "en": "Switzerland" }
+  "serverCountry": {
+    "de": "der Schweiz",
+    "en": "Switzerland"
+  }
 }

@@ -1,0 +1,12 @@
+{
+  "name": "Carlos Niggli",
+  "street": "",
+  "postcode": "",
+  "city": "",
+  "country": { "de": "Schweiz", "en": "Switzerland" },
+  "email": "info@propweather.org",
+  "emailViaCloudflare": true,
+  "callsign": "",
+  "hosting": "cloudflare",
+  "serverCountry": { "de": "der Schweiz", "en": "Switzerland" }
+}

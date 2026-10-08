@@ -444,8 +444,8 @@ const MIME = {
   '.txt': 'text/plain; charset=utf-8',
 };
 
-// Angaben zum Betreiber für Impressum und Datenschutz – liegen in operator.json
-// (nicht im Git-Repository). Fehlt die Datei, werden Beispieldaten mit Warnhinweis verwendet.
+// Angaben zum Betreiber für Impressum und Datenschutz – liegen in operator.json.
+// Fehlt die Datei, werden Beispieldaten mit Warnhinweis verwendet.
 const OPERATOR_FILE = process.env.OPERATOR_FILE || path.join(__dirname, 'operator.json');
 const HOSTING_TYPES = ['cloudflare', 'caddy'];
 
@@ -475,6 +475,8 @@ function loadOperator() {
     country: both(op.country, 'country'),
     serverCountry: both(op.serverCountry, 'serverCountry'),
     email,
+    // true, wenn E-Mails an die Adresse über Cloudflare Email Routing weitergeleitet werden
+    emailViaCloudflare: op.emailViaCloudflare === true,
     callsign: op.callsign ? text(op.callsign, 'callsign') : '',
     hosting: op.hosting,
   };

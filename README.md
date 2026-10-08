@@ -57,10 +57,11 @@ public/i18n.js       Texte Deutsch/Englisch
 public/lang.js       Sprachwahl (gemeinsam für alle Seiten)
 public/app.js        Darstellung, Diagramme (SVG, ohne Bibliotheken), Auto-Refresh
 public/legal.js      Sprachwahl für Impressum und Datenschutz
-operator.example.json  Vorlage für operator.json (nicht im Repository)
+operator.json        Angaben zum Betreiber für Impressum und Datenschutz
+operator.example.json  Vorlage für eine eigene operator.json
 public/styles.css    Gestaltung
 public/fonts/        League Gothic und Figtree (SIL Open Font License)
-deploy/              systemd-Dienst und Caddy-Konfiguration
+deploy/              Installations- und Update-Skript, systemd-Dienst, Caddy-Konfiguration
 ```
 
 Der Server ist nötig, weil der hamqsl.com-Feed keine CORS-Header sendet und die
