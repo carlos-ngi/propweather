@@ -1,0 +1,4 @@
+User-agent: *
+Disallow: /healthz
+
+Sitemap: https://propweather.org/sitemap.xml

@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9"
+        xmlns:xhtml="http://www.w3.org/1999/xhtml">
+  <url>
+    <loc>https://propweather.org/</loc>
+    <changefreq>hourly</changefreq>
+    <xhtml:link rel="alternate" hreflang="de" href="https://propweather.org/?lang=de"/>
+    <xhtml:link rel="alternate" hreflang="en" href="https://propweather.org/?lang=en"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://propweather.org/"/>
+  </url>
+  <url>
+    <loc>https://propweather.org/?lang=de</loc>
+    <changefreq>hourly</changefreq>
+    <xhtml:link rel="alternate" hreflang="de" href="https://propweather.org/?lang=de"/>
+    <xhtml:link rel="alternate" hreflang="en" href="https://propweather.org/?lang=en"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://propweather.org/"/>
+  </url>
+  <url>
+    <loc>https://propweather.org/?lang=en</loc>
+    <changefreq>hourly</changefreq>
+    <xhtml:link rel="alternate" hreflang="de" href="https://propweather.org/?lang=de"/>
+    <xhtml:link rel="alternate" hreflang="en" href="https://propweather.org/?lang=en"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://propweather.org/"/>
+  </url>
+</urlset>
