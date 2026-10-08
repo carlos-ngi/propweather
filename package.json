@@ -1,5 +1,5 @@
 {
-  "name": "hamweather",
+  "name": "propweather",
   "version": "1.1.0",
   "description": "Solar-terrestrial data and propagation conditions for radio amateurs (DE/EN). Data: N0NBH/hamqsl.com, NOAA SWPC, NASA, ESA.",
   "private": true,

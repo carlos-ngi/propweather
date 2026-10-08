@@ -1,19 +1,19 @@
-# systemd-Dienst für HamWeather / Funkwetter
+# systemd-Dienst für PropWeather
 # Installation: siehe DEPLOY.md
-#   sudo cp deploy/hamweather.service /etc/systemd/system/
-#   sudo systemctl daemon-reload && sudo systemctl enable --now hamweather
+#   sudo cp deploy/propweather.service /etc/systemd/system/
+#   sudo systemctl daemon-reload && sudo systemctl enable --now propweather
 
 [Unit]
-Description=HamWeather (Funkwetter) – solar-terrestrial data
+Description=PropWeather – solar-terrestrial data
 After=network-online.target
 Wants=network-online.target
 
 [Service]
 Type=simple
-User=hamweather
-Group=hamweather
-WorkingDirectory=/opt/hamweather
-ExecStart=/usr/bin/node /opt/hamweather/server.js
+User=propweather
+Group=propweather
+WorkingDirectory=/opt/propweather
+ExecStart=/usr/bin/node /opt/propweather/server.js
 Environment=NODE_ENV=production
 Environment=HOST=127.0.0.1
 Environment=PORT=3000

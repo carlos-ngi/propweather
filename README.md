@@ -1,4 +1,4 @@
-# Funkwetter
+# PropWeather
 
 Solar-terrestrische Daten und Ausbreitungsbedingungen für Funkamateure – inhaltlich wie
 [hamqsl.com](https://www.hamqsl.com/solar.html), gestaltet in der Formensprache von

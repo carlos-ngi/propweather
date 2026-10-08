@@ -1,6 +1,6 @@
 # Hosting auf Proxmox – sicher
 
-Diese Anleitung setzt Funkwetter in einem **unprivilegierten LXC-Container** auf Proxmox auf.
+Diese Anleitung setzt PropWeather in einem **unprivilegierten LXC-Container** auf Proxmox auf.
 Ziel: Selbst wenn jemand die Webseite angreift, kommt er nicht an dein Heimnetz und nicht an den
 Proxmox-Host.
 
@@ -86,7 +86,7 @@ dpkg-reconfigure -plow unattended-upgrades
 Eigenen Benutzer ohne Login anlegen:
 
 ```bash
-useradd --system --user-group --home-dir /opt/hamweather --shell /usr/sbin/nologin hamweather
+useradd --system --user-group --home-dir /opt/propweather --shell /usr/sbin/nologin propweather
 ```
 
 ## 3. Code holen
@@ -95,15 +95,15 @@ Das Repository ist privat. Dafür einen **Deploy Key** (nur lesend) verwenden �
 Passwort und kein Token mit Schreibrechten auf den Server legen.
 
 ```bash
-ssh-keygen -t ed25519 -f /root/.ssh/hamweather_deploy -N "" -C "hamweather-deploy"
-cat /root/.ssh/hamweather_deploy.pub
+ssh-keygen -t ed25519 -f /root/.ssh/propweather_deploy -N "" -C "propweather-deploy"
+cat /root/.ssh/propweather_deploy.pub
 ```
 
 Den ausgegebenen Schlüssel auf GitHub eintragen: *Repository → Settings → Deploy keys → Add deploy key*,
 **«Allow write access» NICHT ankreuzen**.
 
 ```bash
-GIT_SSH_COMMAND="ssh -i /root/.ssh/hamweather_deploy" git clone git@github.com:carlos-ngi/hamweather.git /opt/hamweather
+GIT_SSH_COMMAND="ssh -i /root/.ssh/propweather_deploy" git clone git@github.com:carlos-ngi/hamweather.git /opt/propweather
 ```
 
 Beim ersten Verbinden fragt SSH nach dem Fingerabdruck von github.com. Vergleichen mit
@@ -112,8 +112,8 @@ Beim ersten Verbinden fragt SSH nach dem Fingerabdruck von github.com. Vergleich
 Rechte setzen – der Dienst darf seinen Code lesen, aber **nicht verändern**:
 
 ```bash
-chown -R root:hamweather /opt/hamweather
-chmod -R u=rwX,g=rX,o= /opt/hamweather
+chown -R root:propweather /opt/propweather
+chmod -R u=rwX,g=rX,o= /opt/propweather
 ```
 
 ### Angaben für Impressum und Datenschutz
@@ -122,9 +122,9 @@ Die Angaben zum Betreiber stehen in `operator.json`. Diese Datei ist absichtlich
 Git-Repository** – sie wird nur auf dem Server angelegt:
 
 ```bash
-cp /opt/hamweather/operator.example.json /opt/hamweather/operator.json
-nano /opt/hamweather/operator.json
-chown root:hamweather /opt/hamweather/operator.json && chmod 640 /opt/hamweather/operator.json
+cp /opt/propweather/operator.example.json /opt/propweather/operator.json
+nano /opt/propweather/operator.json
+chown root:propweather /opt/propweather/operator.json && chmod 640 /opt/propweather/operator.json
 ```
 
 | Feld | Inhalt |
@@ -137,8 +137,8 @@ chown root:hamweather /opt/hamweather/operator.json && chmod 640 /opt/hamweather
 | `serverCountry` | Land, in dem der Server steht («der Schweiz» / «Switzerland») |
 
 Fehlt die Datei, zeigen beide Seiten Beispieldaten mit einem roten Warnhinweis. Ist sie fehlerhaft,
-startet der Dienst nicht und `journalctl -u hamweather` nennt das Feld. Nach Änderungen:
-`systemctl restart hamweather`.
+startet der Dienst nicht und `journalctl -u propweather` nennt das Feld. Nach Änderungen:
+`systemctl restart propweather`.
 
 > **Wichtig:** Stimmt `hosting` nicht mit der tatsächlichen Variante überein, ist die
 > Datenschutzerklärung falsch.
@@ -146,27 +146,30 @@ startet der Dienst nicht und `journalctl -u hamweather` nennt das Feld. Nach Än
 ## 4. Dienst einrichten
 
 ```bash
-cp /opt/hamweather/deploy/hamweather.service /etc/systemd/system/
+cp /opt/propweather/deploy/propweather.service /etc/systemd/system/
 systemctl daemon-reload
-systemctl enable --now hamweather
-systemctl status hamweather
+systemctl enable --now propweather
+systemctl status propweather
 curl -s http://127.0.0.1:3000/healthz
 ```
 
 Die letzte Zeile muss `ok` ausgeben.
 
-> Startet der Dienst nicht und `journalctl -u hamweather` meldet `226/NAMESPACE`, ist beim Container
+> Startet der Dienst nicht und `journalctl -u propweather` meldet `226/NAMESPACE`, ist beim Container
 > *Nesting* nicht aktiviert (Schritt 1). Auf dem Proxmox-Host: `pct set <CT-ID> --features nesting=1`,
 > dann Container neu starten.
 
 ## 5A. Veröffentlichen mit Cloudflare Tunnel (empfohlen)
 
-1. Domain bei Cloudflare einrichten (Gratis-Plan).
+1. Bei Cloudflare ein Konto anlegen, *Add a site* → `propweather.org` → **Free**-Plan wählen.
+   Cloudflare zeigt zwei Nameserver an. Diese beim Anbieter, bei dem du die Domain gekauft hast,
+   als Nameserver eintragen. Die Domain bleibt dort registriert – es entstehen keine Zusatzkosten.
+   Die Umstellung dauert meist wenige Minuten bis einige Stunden.
 2. Im Cloudflare-Dashboard: *Zero Trust → Networks → Tunnels → Create a tunnel → Cloudflared*.
 3. Cloudflare zeigt Befehle für **Debian** an – diese im Container ausführen. Sie installieren
    `cloudflared` als Dienst.
-4. *Public Hostname* hinzufügen: z. B. `wetter.deinedomain.ch`, Service **HTTP**, URL
-   **`127.0.0.1:3000`**.
+4. *Public Hostname* hinzufügen: Domain `propweather.org` (Subdomain leer lassen), Service **HTTP**,
+   URL **`127.0.0.1:3000`**. Optional einen zweiten mit Subdomain `www` und derselben URL.
 5. Im Cloudflare-Dashboard unter *SSL/TLS → Edge Certificates*: **Always Use HTTPS** und **HSTS**
    einschalten.
 
@@ -176,12 +179,12 @@ Am Router wird **nichts** freigegeben.
 
 ```bash
 apt install -y caddy
-cp /opt/hamweather/deploy/Caddyfile /etc/caddy/Caddyfile
-nano /etc/caddy/Caddyfile        # wetter.example.ch durch die eigene Domain ersetzen
+cp /opt/propweather/deploy/Caddyfile /etc/caddy/Caddyfile
 systemctl reload caddy
 ```
 
-- DNS: A-Eintrag (und ggf. AAAA) der Domain auf die öffentliche IP zeigen lassen.
+- DNS beim Domain-Anbieter: A-Eintrag (und ggf. AAAA) für `propweather.org` und `www` auf die
+  öffentliche IP zeigen lassen. Ohne `www`-Eintrag den `www`-Block im Caddyfile löschen.
 - Router: **nur** TCP 80 und 443 an die IP des Containers weiterleiten.
 - Caddy holt das HTTPS-Zertifikat automatisch und erneuert es selbst.
 
@@ -204,10 +207,10 @@ Von aussen:
 Betriebssystem: läuft automatisch (unattended-upgrades). Neue Version der Webseite:
 
 ```bash
-cd /opt/hamweather
-GIT_SSH_COMMAND="ssh -i /root/.ssh/hamweather_deploy" git pull
-chown -R root:hamweather /opt/hamweather && chmod -R u=rwX,g=rX,o= /opt/hamweather
-systemctl restart hamweather
+cd /opt/propweather
+GIT_SSH_COMMAND="ssh -i /root/.ssh/propweather_deploy" git pull
+chown -R root:propweather /opt/propweather && chmod -R u=rwX,g=rX,o= /opt/propweather
+systemctl restart propweather
 ```
 
 ## 8. Proxmox-Host absichern

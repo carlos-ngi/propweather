@@ -1,6 +1,6 @@
 'use strict';
 
-// Funkwetter – kleiner Server ohne Abhängigkeiten.
+// PropWeather – kleiner Server ohne Abhängigkeiten.
 //
 // - liefert die statische Seite aus /public (feste Dateiliste, beim Start geladen)
 // - bündelt die Datenquellen unter /api/data (N0NBH/hamqsl.com XML + NOAA SWPC JSON)
@@ -21,7 +21,7 @@ const TRUST_PROXY = process.env.TRUST_PROXY === '1';
 const RATE_LIMIT = Number(process.env.RATE_LIMIT) || 300; // Anfragen pro Minute und IP
 
 const PUBLIC_DIR = path.join(__dirname, 'public');
-const USER_AGENT = 'Funkwetter/1.2 (solar-terrestrial dashboard for radio amateurs)';
+const USER_AGENT = 'PropWeather/1.2 (solar-terrestrial dashboard for radio amateurs)';
 const FETCH_TIMEOUT_MS = 20_000;
 const MIN = 60_000;
 const MB = 1024 * 1024;
@@ -646,7 +646,7 @@ server.keepAliveTimeout = 5_000;
 server.maxHeadersCount = 50;
 
 server.listen(PORT, HOST, () => {
-  console.log(`Funkwetter läuft auf http://${HOST === '0.0.0.0' ? 'localhost' : HOST}:${PORT}`);
+  console.log(`PropWeather läuft auf http://${HOST === '0.0.0.0' ? 'localhost' : HOST}:${PORT}`);
   // Cache vorwärmen
   buildPayload().catch(() => {});
 });
