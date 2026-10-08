@@ -46,6 +46,10 @@ LockPersonality=true
 SystemCallArchitectures=native
 SystemCallFilter=@system-service
 SystemCallFilter=~@privileged
+# Verbotene Aufrufe mit «nicht erlaubt» beantworten statt den Prozess zu beenden:
+# Node.js probiert beim Start neuere Kernel-Funktionen (z. B. io_uring) und weicht
+# bei einer Fehlermeldung selbst auf ältere aus. Ohne diese Zeile: Abbruch mit 31/SYS.
+SystemCallErrorNumber=EPERM
 UMask=0077
 # Hinweis: MemoryDenyWriteExecute darf bei Node.js NICHT gesetzt werden (JIT-Compiler).
 

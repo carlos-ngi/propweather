@@ -71,6 +71,7 @@ echo >&2
 echo "FEHLER: Der Dienst antwortet nicht." >&2
 journalctl -u propweather -n 30 --no-pager >&2 || true
 echo >&2
+echo "Steht oben «31/SYS», blockiert die Sandbox einen Systemaufruf – Fehlermeldung an den Entwickler schicken." >&2
 echo "Steht oben «226/NAMESPACE», ist beim Container «Nesting» nicht aktiviert." >&2
 echo "Auf dem Proxmox-Host: pct set <CT-ID> --features nesting=1  und Container neu starten." >&2
 exit 1
