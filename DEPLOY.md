@@ -1,6 +1,6 @@
 # Hosting auf Proxmox – sicher
 
-Diese Anleitung setzt HamWeather in einem **unprivilegierten LXC-Container** auf Proxmox auf.
+Diese Anleitung setzt Funkwetter in einem **unprivilegierten LXC-Container** auf Proxmox auf.
 Ziel: Selbst wenn jemand die Webseite angreift, kommt er nicht an dein Heimnetz und nicht an den
 Proxmox-Host.
 
@@ -115,6 +115,33 @@ Rechte setzen – der Dienst darf seinen Code lesen, aber **nicht verändern**:
 chown -R root:hamweather /opt/hamweather
 chmod -R u=rwX,g=rX,o= /opt/hamweather
 ```
+
+### Angaben für Impressum und Datenschutz
+
+Die Angaben zum Betreiber stehen in `operator.json`. Diese Datei ist absichtlich **nicht im
+Git-Repository** – sie wird nur auf dem Server angelegt:
+
+```bash
+cp /opt/hamweather/operator.example.json /opt/hamweather/operator.json
+nano /opt/hamweather/operator.json
+chown root:hamweather /opt/hamweather/operator.json && chmod 640 /opt/hamweather/operator.json
+```
+
+| Feld | Inhalt |
+| --- | --- |
+| `name`, `street`, `postcode`, `city` | Name und Postadresse (Pflicht für Impressum und Datenschutzerklärung) |
+| `country` | Land, deutsch und englisch |
+| `email` | Kontaktadresse – wird öffentlich angezeigt |
+| `callsign` | Rufzeichen (optional, leer lassen = nicht anzeigen) |
+| `hosting` | `"cloudflare"` (Variante A) oder `"caddy"` (Variante B) – passt die Datenschutzerklärung automatisch an |
+| `serverCountry` | Land, in dem der Server steht («der Schweiz» / «Switzerland») |
+
+Fehlt die Datei, zeigen beide Seiten Beispieldaten mit einem roten Warnhinweis. Ist sie fehlerhaft,
+startet der Dienst nicht und `journalctl -u hamweather` nennt das Feld. Nach Änderungen:
+`systemctl restart hamweather`.
+
+> **Wichtig:** Stimmt `hosting` nicht mit der tatsächlichen Variante überein, ist die
+> Datenschutzerklärung falsch.
 
 ## 4. Dienst einrichten
 

@@ -1,6 +1,6 @@
 'use strict';
 
-// HamWeather / Funkwetter – kleiner Server ohne Abhängigkeiten.
+// Funkwetter – kleiner Server ohne Abhängigkeiten.
 //
 // - liefert die statische Seite aus /public (feste Dateiliste, beim Start geladen)
 // - bündelt die Datenquellen unter /api/data (N0NBH/hamqsl.com XML + NOAA SWPC JSON)
@@ -21,7 +21,7 @@ const TRUST_PROXY = process.env.TRUST_PROXY === '1';
 const RATE_LIMIT = Number(process.env.RATE_LIMIT) || 300; // Anfragen pro Minute und IP
 
 const PUBLIC_DIR = path.join(__dirname, 'public');
-const USER_AGENT = 'HamWeather/1.1 (+https://github.com/carlos-ngi/hamweather)';
+const USER_AGENT = 'Funkwetter/1.2 (solar-terrestrial dashboard for radio amateurs)';
 const FETCH_TIMEOUT_MS = 20_000;
 const MIN = 60_000;
 const MB = 1024 * 1024;
@@ -444,6 +444,64 @@ const MIME = {
   '.txt': 'text/plain; charset=utf-8',
 };
 
+// Angaben zum Betreiber für Impressum und Datenschutz – liegen in operator.json
+// (nicht im Git-Repository). Fehlt die Datei, werden Beispieldaten mit Warnhinweis verwendet.
+const OPERATOR_FILE = process.env.OPERATOR_FILE || path.join(__dirname, 'operator.json');
+const HOSTING_TYPES = ['cloudflare', 'caddy'];
+
+function loadOperator() {
+  let file = OPERATOR_FILE;
+  let example = false;
+  if (!fs.existsSync(file)) {
+    file = path.join(__dirname, 'operator.example.json');
+    example = true;
+    console.warn('WARNUNG: operator.json fehlt – Impressum und Datenschutz zeigen Beispieldaten (siehe DEPLOY.md).');
+  }
+  const op = JSON.parse(fs.readFileSync(file, 'utf8'));
+  const text = (v, key) => {
+    if (typeof v !== 'string' || v.length > 200) throw new Error(`operator.json: "${key}" fehlt oder ist zu lang`);
+    return v.trim();
+  };
+  const both = (v, key) => ({ de: text(v?.de, `${key}.de`), en: text(v?.en, `${key}.en`) });
+  if (!HOSTING_TYPES.includes(op.hosting)) throw new Error(`operator.json: "hosting" muss ${HOSTING_TYPES.join(' oder ')} sein`);
+  const email = text(op.email, 'email');
+  if (!/^[^\s@<>"]+@[^\s@<>"]+\.[^\s@<>"]+$/.test(email)) throw new Error('operator.json: "email" ist ungültig');
+  return {
+    example,
+    name: text(op.name, 'name'),
+    street: text(op.street, 'street'),
+    postcode: text(op.postcode, 'postcode'),
+    city: text(op.city, 'city'),
+    country: both(op.country, 'country'),
+    serverCountry: both(op.serverCountry, 'serverCountry'),
+    email,
+    callsign: op.callsign ? text(op.callsign, 'callsign') : '',
+    hosting: op.hosting,
+  };
+}
+
+const escHtml = (s) =>
+  String(s).replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' })[c]);
+
+// Einfache Vorlagen: {{feld}} / {{feld.de}} sowie Blöcke
+// <!--if:feld-->…<!--endif--> (Feld gesetzt) und <!--if:feld=wert-->…<!--endif-->
+function renderTemplate(html, data, fileName) {
+  const get = (p) => p.split('.').reduce((o, k) => (o == null ? undefined : o[k]), data);
+  const out = html
+    .replace(/<!--if:(\w+)(?:=(\w+))?-->([\s\S]*?)<!--endif-->/g, (m, key, value, body) => {
+      const v = get(key);
+      return (value === undefined ? Boolean(v) : v === value) ? body : '';
+    })
+    .replace(/\{\{([\w.]+)\}\}/g, (m, p) => {
+      const v = get(p);
+      if (typeof v !== 'string') throw new Error(`${fileName}: unbekannter Platzhalter {{${p}}}`);
+      return escHtml(v);
+    });
+  return Buffer.from(out, 'utf8');
+}
+
+const OPERATOR = loadOperator();
+
 function loadStatic() {
   const files = new Map();
   const walk = (dir) => {
@@ -452,7 +510,8 @@ function loadStatic() {
       if (entry.name.startsWith('.')) continue;
       if (entry.isDirectory()) walk(full);
       else if (entry.isFile() && MIME[path.extname(entry.name).toLowerCase()]) {
-        const body = fs.readFileSync(full);
+        const raw = fs.readFileSync(full);
+        const body = entry.name.endsWith('.html') ? renderTemplate(raw.toString('utf8'), OPERATOR, entry.name) : raw;
         const url = '/' + path.relative(PUBLIC_DIR, full).split(path.sep).join('/');
         files.set(url, {
           body,
@@ -587,7 +646,7 @@ server.keepAliveTimeout = 5_000;
 server.maxHeadersCount = 50;
 
 server.listen(PORT, HOST, () => {
-  console.log(`HamWeather läuft auf http://${HOST === '0.0.0.0' ? 'localhost' : HOST}:${PORT}`);
+  console.log(`Funkwetter läuft auf http://${HOST === '0.0.0.0' ? 'localhost' : HOST}:${PORT}`);
   // Cache vorwärmen
   buildPayload().catch(() => {});
 });

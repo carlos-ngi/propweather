@@ -1,0 +1,11 @@
+{
+  "name": "Vorname Nachname",
+  "street": "Musterstrasse 1",
+  "postcode": "8000",
+  "city": "Zürich",
+  "country": { "de": "Schweiz", "en": "Switzerland" },
+  "email": "kontakt@example.ch",
+  "callsign": "",
+  "hosting": "cloudflare",
+  "serverCountry": { "de": "der Schweiz", "en": "Switzerland" }
+}

@@ -1,4 +1,4 @@
-# HamWeather / Funkwetter
+# Funkwetter
 
 Solar-terrestrische Daten und Ausbreitungsbedingungen für Funkamateure – inhaltlich wie
 [hamqsl.com](https://www.hamqsl.com/solar.html), gestaltet in der Formensprache von
@@ -23,6 +23,7 @@ Danach im Browser: <http://localhost:3000>
 | `HOST` | `127.0.0.1` | Adresse; nur lokal erreichbar, für den Betrieb hinter einem Reverse-Proxy gedacht |
 | `TRUST_PROXY` | – | `1`, wenn Caddy/nginx/cloudflared davor steht (echte Besucher-IP für das Rate-Limit) |
 | `RATE_LIMIT` | `300` | Anfragen pro Minute und IP |
+| `OPERATOR_FILE` | `./operator.json` | Angaben für Impressum und Datenschutz (siehe [DEPLOY.md](DEPLOY.md)) |
 
 **Hosting auf Proxmox:** siehe [DEPLOY.md](DEPLOY.md).
 
@@ -50,8 +51,13 @@ in [`public/index.html`](public/index.html) (Blöcke mit `data-lang`).
 ```
 server.js            Node-Server: statische Dateien, /api/data, /img/<id>, /healthz
 public/index.html    Seite (inkl. Erklärungen DE/EN)
+public/impressum.html, public/datenschutz.html
+                     Impressum und Datenschutzerklärung (DE/EN, Betreiberdaten aus operator.json)
 public/i18n.js       Texte Deutsch/Englisch
-public/app.js        Darstellung, Diagramme (SVG, ohne Bibliotheken), Sprachwahl, Auto-Refresh
+public/lang.js       Sprachwahl (gemeinsam für alle Seiten)
+public/app.js        Darstellung, Diagramme (SVG, ohne Bibliotheken), Auto-Refresh
+public/legal.js      Sprachwahl für Impressum und Datenschutz
+operator.example.json  Vorlage für operator.json (nicht im Repository)
 public/styles.css    Gestaltung
 public/fonts/        League Gothic und Figtree (SIL Open Font License)
 deploy/              systemd-Dienst und Caddy-Konfiguration
@@ -65,6 +71,15 @@ vom eigenen Server, damit Besucher keine Drittanbieter kontaktieren.
 Abfrageintervalle: hamqsl.com **höchstens stündlich** (so wünscht es N0NBH), NOAA alle 5–10 Minuten,
 Bilder alle 10 Minuten. Fällt eine Quelle aus, werden die zuletzt geladenen Daten weiter angezeigt
 und die Seite weist darauf hin. Bilder, die älter als 6 Stunden sind, werden als «Veraltet» markiert.
+
+## Rechtliches
+
+- **Impressum** und **Datenschutzerklärung** (DE/EN) sind enthalten; die Betreiberdaten kommen aus
+  `operator.json`.
+- Die Webseite setzt keine Cookies, verwendet kein Tracking und lädt keine Inhalte von Drittanbietern.
+- Die Bildnachweise entsprechen den Vorgaben von NASA/SDO und SOHO (ESA & NASA). Die SOHO-Bilder
+  sind für nicht kommerzielle Nutzung freigegeben – bei Werbung oder anderen kommerziellen Zwecken
+  neu prüfen.
 
 ## Quellen
 

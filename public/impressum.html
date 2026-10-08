@@ -1,0 +1,124 @@
+<!doctype html>
+<html lang="de-CH">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Impressum – Funkwetter</title>
+  <meta name="description" content="Impressum, Haftungsausschluss und Quellenangaben der Webseite Funkwetter.">
+  <meta name="theme-color" content="#c891fa">
+  <link rel="icon" href="favicon.svg" type="image/svg+xml">
+  <link rel="stylesheet" href="styles.css">
+  <script src="i18n.js" defer></script>
+  <script src="lang.js" defer></script>
+  <script src="legal.js" defer></script>
+</head>
+<body data-page="imprint">
+  <header class="site-header">
+    <div class="site-header__inner">
+      <a class="brand" href="./" data-i18n-aria="legal.back" aria-label="Zur Startseite">
+        <span class="brand__solid" data-i18n="brand.a">Funk</span>
+        <span class="brand__outline"><span data-i18n="brand.b">Wetter</span><small data-i18n="brand.sub">KW · VHF · Sonne</small></span>
+      </a>
+      <div class="site-header__end">
+        <a class="legal-back" href="./" data-i18n="legal.back">Zur Startseite</a>
+        <div class="lang-switch" role="group" data-i18n-aria="lang.label" aria-label="Sprache">
+          <button type="button" data-set-lang="de" lang="de" aria-pressed="true">DE</button>
+          <button type="button" data-set-lang="en" lang="en" aria-pressed="false">EN</button>
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <main class="legal">
+    <section class="hero hero--small bg-purple">
+      <div class="layout">
+        <h1 class="hero__title" data-i18n="imprint.heading">Impressum</h1>
+      </div>
+    </section>
+
+    <!--if:example-->
+    <div class="layout notice"><div><strong>Beispieldaten / Example data</strong>operator.json fehlt – bitte nach DEPLOY.md anlegen. / operator.json is missing – see DEPLOY.md.</div></div>
+    <!--endif-->
+
+    <!-- ======================= Deutsch ======================= -->
+    <article class="section layout legal__body" data-lang="de">
+      <h2>Verantwortlich für den Inhalt</h2>
+      <address>
+        {{name}}<br>
+        {{street}}<br>
+        {{postcode}} {{city}}<br>
+        {{country.de}}
+      </address>
+      <!--if:callsign--><p>Rufzeichen: {{callsign}}</p><!--endif-->
+      <p>E-Mail: <a href="mailto:{{email}}">{{email}}</a></p>
+      <p>Diese Webseite ist ein privates, nicht kommerzielles Angebot. Sie enthält keine Werbung, verkauft nichts und erhebt keine Gebühren.</p>
+
+      <h2>Haftungsausschluss</h2>
+      <p>Die angezeigten Daten werden automatisch von den unten genannten Quellen übernommen und ohne inhaltliche Prüfung dargestellt. Für ihre Richtigkeit, Vollständigkeit und Aktualität übernehme ich keine Gewähr. Die Bandbedingungen sind berechnete Schätzungen, keine Messungen.</p>
+      <p>Die Angaben dienen der Information von Funkamateurinnen und Funkamateuren. Sie eignen sich nicht als Grundlage für sicherheitsrelevante Entscheidungen. Massgebend für offizielle Weltraumwetter-Warnungen sind die Veröffentlichungen des <a href="https://www.swpc.noaa.gov/" rel="noopener noreferrer">NOAA Space Weather Prediction Center</a>.</p>
+      <p>Eine Haftung für Schäden, die aus der Nutzung oder Nichtverfügbarkeit dieser Webseite entstehen, ist ausgeschlossen, soweit dies gesetzlich zulässig ist.</p>
+
+      <h2>Links zu anderen Webseiten</h2>
+      <p>Diese Webseite enthält Links zu externen Webseiten. Für deren Inhalte sind ausschliesslich die jeweiligen Betreiber verantwortlich. Zum Zeitpunkt der Verlinkung waren keine rechtswidrigen Inhalte erkennbar.</p>
+
+      <h2>Datenquellen und Bildnachweis</h2>
+      <ul>
+        <li><strong>Solar-terrestrische Daten, KW- und VHF-Bedingungen:</strong> Paul L. Herrman, N0NBH – <a href="https://www.hamqsl.com/solar.html" rel="noopener noreferrer">hamqsl.com</a>. Der Datenfeed wird, wie vom Anbieter gewünscht, höchstens einmal pro Stunde abgefragt.</li>
+        <li><strong>K-Index, Röntgenfluss, Flares, Sonnenwind, NOAA-Skalen, GOES/SUVI-Bilder, OVATION-Polarlichtmodell, D-RAP:</strong> <a href="https://www.swpc.noaa.gov/" rel="noopener noreferrer">NOAA Space Weather Prediction Center (SWPC)</a>.</li>
+        <li><strong>HMI-Bild:</strong> Courtesy of NASA/SDO and the AIA, EVE, and HMI science teams.</li>
+        <li><strong>LASCO-C3-Bild:</strong> Courtesy of SOHO/LASCO consortium. SOHO is a project of international cooperation between ESA and NASA.</li>
+      </ul>
+      <p>Die Nennung dieser Stellen bedeutet weder eine Verbindung zu ihnen noch eine Billigung dieser Webseite durch sie.</p>
+
+      <h2>Urheberrecht</h2>
+      <p>Texte, Gestaltung und Programmcode dieser Webseite: © {{name}}. Für die Daten und Bilder gelten die Bedingungen der jeweiligen Quellen.</p>
+      <p>Schriften: <em>League Gothic</em> (Copyright 2020 The League Gothic Project Authors) und <em>Figtree</em> (Copyright 2022 The Figtree Project Authors), beide unter der SIL Open Font License 1.1 – Lizenztexte: <a href="fonts/LICENSE-LeagueGothic.txt">League Gothic</a>, <a href="fonts/LICENSE-Figtree.txt">Figtree</a>.</p>
+    </article>
+
+    <!-- ======================= English ======================= -->
+    <article class="section layout legal__body" data-lang="en">
+      <h2>Responsible for the content</h2>
+      <address>
+        {{name}}<br>
+        {{street}}<br>
+        {{postcode}} {{city}}<br>
+        {{country.en}}
+      </address>
+      <!--if:callsign--><p>Call sign: {{callsign}}</p><!--endif-->
+      <p>E-mail: <a href="mailto:{{email}}">{{email}}</a></p>
+      <p>This website is a private, non-commercial project. It contains no advertising, sells nothing and charges no fees.</p>
+
+      <h2>Disclaimer</h2>
+      <p>The data shown is taken automatically from the sources listed below and displayed without any review of its content. I give no warranty as to its accuracy, completeness or timeliness. The band conditions are calculated estimates, not measurements.</p>
+      <p>The information is intended for radio amateurs. It is not suitable as a basis for safety-related decisions. Official space weather alerts are published by the <a href="https://www.swpc.noaa.gov/" rel="noopener noreferrer">NOAA Space Weather Prediction Center</a>.</p>
+      <p>Liability for damage resulting from the use or unavailability of this website is excluded to the extent permitted by law.</p>
+
+      <h2>Links to other websites</h2>
+      <p>This website contains links to external websites. Their operators are solely responsible for their content. No unlawful content was apparent at the time the links were set.</p>
+
+      <h2>Data sources and image credits</h2>
+      <ul>
+        <li><strong>Solar-terrestrial data, HF and VHF conditions:</strong> Paul L. Herrman, N0NBH – <a href="https://www.hamqsl.com/solar.html" rel="noopener noreferrer">hamqsl.com</a>. As requested by the provider, the data feed is polled at most once per hour.</li>
+        <li><strong>K-index, X-ray flux, flares, solar wind, NOAA scales, GOES/SUVI images, OVATION aurora model, D-RAP:</strong> <a href="https://www.swpc.noaa.gov/" rel="noopener noreferrer">NOAA Space Weather Prediction Center (SWPC)</a>.</li>
+        <li><strong>HMI image:</strong> Courtesy of NASA/SDO and the AIA, EVE, and HMI science teams.</li>
+        <li><strong>LASCO C3 image:</strong> Courtesy of SOHO/LASCO consortium. SOHO is a project of international cooperation between ESA and NASA.</li>
+      </ul>
+      <p>Naming these organisations does not imply any affiliation with them or any endorsement of this website by them.</p>
+
+      <h2>Copyright</h2>
+      <p>Text, design and program code of this website: © {{name}}. The data and images are subject to the terms of their respective sources.</p>
+      <p>Fonts: <em>League Gothic</em> (Copyright 2020 The League Gothic Project Authors) and <em>Figtree</em> (Copyright 2022 The Figtree Project Authors), both under the SIL Open Font License 1.1 – licence texts: <a href="fonts/LICENSE-LeagueGothic.txt">League Gothic</a>, <a href="fonts/LICENSE-Figtree.txt">Figtree</a>.</p>
+    </article>
+  </main>
+
+  <footer class="site-footer site-footer--legal">
+    <div class="layout site-footer__bottom">
+      <span><span data-i18n="meta.brand">Funkwetter</span> © <span id="year">2026</span></span>
+      <span class="site-footer__links">
+        <a href="impressum.html" data-i18n="footer.imprint">Impressum</a>
+        <a href="datenschutz.html" data-i18n="footer.privacy">Datenschutz</a>
+      </span>
+    </div>
+  </footer>
+</body>
+</html>

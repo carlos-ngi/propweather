@@ -1,0 +1,174 @@
+<!doctype html>
+<html lang="de-CH">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Datenschutzerklärung – Funkwetter</title>
+  <meta name="description" content="Datenschutzerklärung der Webseite Funkwetter: keine Cookies, kein Tracking.">
+  <meta name="theme-color" content="#c891fa">
+  <link rel="icon" href="favicon.svg" type="image/svg+xml">
+  <link rel="stylesheet" href="styles.css">
+  <script src="i18n.js" defer></script>
+  <script src="lang.js" defer></script>
+  <script src="legal.js" defer></script>
+</head>
+<body data-page="privacy">
+  <header class="site-header">
+    <div class="site-header__inner">
+      <a class="brand" href="./" data-i18n-aria="legal.back" aria-label="Zur Startseite">
+        <span class="brand__solid" data-i18n="brand.a">Funk</span>
+        <span class="brand__outline"><span data-i18n="brand.b">Wetter</span><small data-i18n="brand.sub">KW · VHF · Sonne</small></span>
+      </a>
+      <div class="site-header__end">
+        <a class="legal-back" href="./" data-i18n="legal.back">Zur Startseite</a>
+        <div class="lang-switch" role="group" data-i18n-aria="lang.label" aria-label="Sprache">
+          <button type="button" data-set-lang="de" lang="de" aria-pressed="true">DE</button>
+          <button type="button" data-set-lang="en" lang="en" aria-pressed="false">EN</button>
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <main class="legal">
+    <section class="hero hero--small bg-purple">
+      <div class="layout">
+        <h1 class="hero__title" data-i18n="privacy.heading">Datenschutz</h1>
+      </div>
+    </section>
+
+    <!--if:example-->
+    <div class="layout notice"><div><strong>Beispieldaten / Example data</strong>operator.json fehlt – bitte nach DEPLOY.md anlegen. / operator.json is missing – see DEPLOY.md.</div></div>
+    <!--endif-->
+
+    <!-- ======================= Deutsch ======================= -->
+    <article class="section layout legal__body" data-lang="de">
+      <p class="legal__date">Stand: 8. Oktober 2026</p>
+
+      <h2>Das Wichtigste in Kürze</h2>
+      <ul>
+        <li>Diese Webseite setzt <strong>keine Cookies</strong><!--if:hosting=cloudflare--> (zu technisch notwendigen Cookies von Cloudflare siehe unten)<!--endif-->, verwendet <strong>kein Tracking</strong>, keine Analyse-Werkzeuge, keine Werbung und keine Social-Media-Plugins.</li>
+        <li>Es gibt keine Formulare und keine Benutzerkonten.</li>
+        <li>Schriften und Bilder werden vom eigenen Server geladen. Ihr Browser lädt keine Inhalte von Google, NASA, NOAA oder anderen fremden Webseiten.</li>
+      </ul>
+
+      <h2>Verantwortlicher</h2>
+      <p>Verantwortlich für die Bearbeitung von Personendaten auf dieser Webseite ist:</p>
+      <address>
+        {{name}}<br>
+        {{street}}<br>
+        {{postcode}} {{city}}<br>
+        {{country.de}}<br>
+        E-Mail: <a href="mailto:{{email}}">{{email}}</a>
+      </address>
+
+      <h2>Aufruf der Webseite</h2>
+      <p>Beim Aufruf der Webseite übermittelt Ihr Browser technisch bedingt folgende Daten an den Server: IP-Adresse, Datum und Uhrzeit, die aufgerufene Adresse, Browsertyp und Betriebssystem (User-Agent) sowie gegebenenfalls die Adresse der zuvor besuchten Seite (Referrer).</p>
+      <p>Der Server bearbeitet diese Daten nur, um die Seite auszuliefern. Er schreibt <strong>keine Zugriffsprotokolle</strong>. Zum Schutz vor Missbrauch und Überlastung wird die IP-Adresse höchstens eine Minute lang im Arbeitsspeicher gehalten, um die Zahl der Anfragen pro Besucher zu begrenzen; danach wird sie verworfen. Sie wird weder dauerhaft gespeichert noch ausgewertet oder weitergegeben.</p>
+      <p>Die Webseite wird auf eigener Hardware in {{serverCountry.de}} betrieben.</p>
+      <!--if:hosting=caddy-->
+      <p>Für die verschlüsselte Verbindung (HTTPS) wird der Webserver Caddy eingesetzt. Er schreibt in der verwendeten Konfiguration ebenfalls keine Zugriffsprotokolle. Das HTTPS-Zertifikat stammt von Let’s Encrypt; dabei werden keine Daten von Besucherinnen und Besuchern übermittelt.</p>
+      <!--endif-->
+      <!--if:hosting=cloudflare-->
+      <h2>Auslieferung über Cloudflare</h2>
+      <p>Die Webseite wird über das Netzwerk von Cloudflare, Inc., 101 Townsend St, San Francisco, CA 94107, USA, ausgeliefert. Alle Anfragen laufen dabei über Server von Cloudflare. Cloudflare bearbeitet die oben genannten Verbindungsdaten in meinem Auftrag, um die Seite auszuliefern und vor Angriffen zu schützen. Dabei können Daten in die USA und in andere Länder übermittelt werden, in denen Cloudflare Server betreibt.</p>
+      <p>Cloudflare ist unter dem Swiss-U.S. Data Privacy Framework und dem EU-U.S. Data Privacy Framework zertifiziert. Für so zertifizierte Unternehmen hat der Schweizerische Bundesrat ein angemessenes Datenschutzniveau festgestellt, ebenso die Europäische Kommission.</p>
+      <p>Cloudflare kann aus Sicherheitsgründen technisch notwendige Cookies setzen, etwa zur Erkennung automatisierter Zugriffe (Bots). Diese dienen nicht dem Tracking. Weitere Informationen: <a href="https://www.cloudflare.com/privacypolicy/" rel="noopener noreferrer">Datenschutzerklärung von Cloudflare</a>.</p>
+      <!--endif-->
+
+      <h2>Lokale Speicherung der Sprachwahl</h2>
+      <p>Die Sprache der Seite wird beim ersten Besuch anhand der Spracheinstellung Ihres Browsers gewählt; das geschieht nur auf Ihrem Gerät. Wählen Sie selbst eine Sprache, speichert Ihr Browser diese Wahl («de» oder «en») unter dem Namen «lang» im lokalen Speicher (localStorage). Diese Angabe verlässt Ihr Gerät nicht und wird nicht an den Server übermittelt.</p>
+      <p>Sie können sie jederzeit über die Einstellungen Ihres Browsers löschen («Website-Daten löschen»). In einem privaten Fenster wird sie beim Schliessen automatisch gelöscht.</p>
+
+      <h2>Daten von Drittanbietern</h2>
+      <p>Die angezeigten Daten und Bilder (hamqsl.com, NOAA, NASA, ESA) ruft der Server dieser Webseite selbst ab und speichert sie zwischen. Ihr Browser verbindet sich dabei nicht mit diesen Anbietern, und es werden keine Daten über Sie an sie übermittelt.</p>
+      <p>Erst wenn Sie einen Link zu einer externen Webseite anklicken, verlassen Sie diese Webseite; dann gelten die Datenschutzbestimmungen des jeweiligen Anbieters. Beim Anklicken wird keine Herkunftsadresse (Referrer) mitgesendet.</p>
+
+      <h2>Kontakt per E-Mail</h2>
+      <p>Wenn Sie mir eine E-Mail schreiben, bearbeite ich Ihre Angaben (Adresse, Inhalt) nur, um Ihre Anfrage zu beantworten, und lösche sie, sobald sie dafür nicht mehr benötigt werden.</p>
+
+      <h2>Rechtsgrundlagen</h2>
+      <p>Die Bearbeitung richtet sich nach dem Schweizer Datenschutzgesetz (DSG). Soweit die Datenschutz-Grundverordnung der EU (DSGVO) anwendbar ist, stützt sich die Bearbeitung der Verbindungsdaten auf das berechtigte Interesse an einem sicheren und stabilen Betrieb der Webseite (Art. 6 Abs. 1 lit. f DSGVO). Die Speicherung der Sprachwahl erfolgt auf Ihre Aktion hin und ist für die von Ihnen gewünschte Funktion erforderlich. Die Bearbeitung von E-Mails stützt sich auf Ihre Anfrage (Art. 6 Abs. 1 lit. b und f DSGVO).</p>
+
+      <h2>Ihre Rechte</h2>
+      <p>Sie können Auskunft darüber verlangen, ob und welche Personendaten über Sie bearbeitet werden, und deren Berichtigung oder Löschung verlangen. Sie können der Bearbeitung widersprechen; im Anwendungsbereich der DSGVO haben Sie zudem das Recht auf Einschränkung der Bearbeitung und auf Datenübertragbarkeit. Wenden Sie sich dazu an die oben genannte E-Mail-Adresse. Da diese Webseite keine Daten über Besucherinnen und Besucher speichert, werden in der Regel keine Daten über Sie vorhanden sein.</p>
+      <p>Sie haben das Recht, sich bei einer Datenschutz-Aufsichtsbehörde zu beschweren – in der Schweiz beim <a href="https://www.edoeb.admin.ch/" rel="noopener noreferrer">Eidgenössischen Datenschutz- und Öffentlichkeitsbeauftragten (EDÖB)</a>, Feldeggweg 1, 3003 Bern, in der EU bei der Aufsichtsbehörde Ihres Landes.</p>
+
+      <h2>Datensicherheit</h2>
+      <p>Die Verbindung zu dieser Webseite ist mit HTTPS verschlüsselt. Server und Software werden mit technischen und organisatorischen Massnahmen nach dem Stand der Technik geschützt und regelmässig aktualisiert.</p>
+
+      <h2>Änderungen</h2>
+      <p>Diese Datenschutzerklärung kann angepasst werden, wenn sich die Webseite oder die Rechtslage ändert. Es gilt die jeweils hier veröffentlichte Fassung.</p>
+    </article>
+
+    <!-- ======================= English ======================= -->
+    <article class="section layout legal__body" data-lang="en">
+      <p class="legal__date">Last updated: 8 October 2026</p>
+
+      <h2>Summary</h2>
+      <ul>
+        <li>This website sets <strong>no cookies</strong><!--if:hosting=cloudflare--> (for technically necessary Cloudflare cookies, see below)<!--endif-->, uses <strong>no tracking</strong>, no analytics tools, no advertising and no social media plugins.</li>
+        <li>There are no forms and no user accounts.</li>
+        <li>Fonts and images are loaded from this website's own server. Your browser does not load any content from Google, NASA, NOAA or other third-party websites.</li>
+      </ul>
+
+      <h2>Controller</h2>
+      <p>The controller responsible for processing personal data on this website is:</p>
+      <address>
+        {{name}}<br>
+        {{street}}<br>
+        {{postcode}} {{city}}<br>
+        {{country.en}}<br>
+        E-mail: <a href="mailto:{{email}}">{{email}}</a>
+      </address>
+
+      <h2>Visiting the website</h2>
+      <p>When you visit the website, your browser necessarily transmits the following data to the server: IP address, date and time, the requested address, browser type and operating system (user agent) and, where applicable, the address of the previously visited page (referrer).</p>
+      <p>The server processes this data only to deliver the page. It keeps <strong>no access logs</strong>. To protect against abuse and overload, the IP address is held in memory for at most one minute in order to limit the number of requests per visitor; it is then discarded. It is not stored permanently, analysed or passed on.</p>
+      <p>The website runs on the operator's own hardware in {{serverCountry.en}}.</p>
+      <!--if:hosting=caddy-->
+      <p>The Caddy web server is used for the encrypted connection (HTTPS). In the configuration used, it does not keep access logs either. The HTTPS certificate is issued by Let’s Encrypt; no visitor data is transmitted in the process.</p>
+      <!--endif-->
+      <!--if:hosting=cloudflare-->
+      <h2>Delivery via Cloudflare</h2>
+      <p>The website is delivered via the network of Cloudflare, Inc., 101 Townsend St, San Francisco, CA 94107, USA. All requests pass through Cloudflare's servers. Cloudflare processes the connection data listed above on my behalf in order to deliver the page and protect it against attacks. Data may be transferred to the USA and to other countries in which Cloudflare operates servers.</p>
+      <p>Cloudflare is certified under the Swiss-U.S. Data Privacy Framework and the EU-U.S. Data Privacy Framework. The Swiss Federal Council and the European Commission have recognised an adequate level of data protection for companies certified in this way.</p>
+      <p>For security reasons, Cloudflare may set technically necessary cookies, for example to detect automated access (bots). These are not used for tracking. More information: <a href="https://www.cloudflare.com/privacypolicy/" rel="noopener noreferrer">Cloudflare privacy policy</a>.</p>
+      <!--endif-->
+
+      <h2>Local storage of the language choice</h2>
+      <p>On your first visit, the page language is chosen from your browser's language setting; this happens only on your device. If you choose a language yourself, your browser stores this choice ("de" or "en") under the name "lang" in local storage (localStorage). This value never leaves your device and is not sent to the server.</p>
+      <p>You can delete it at any time in your browser settings ("clear site data"). In a private window it is deleted automatically when the window is closed.</p>
+
+      <h2>Third-party data</h2>
+      <p>The data and images shown (hamqsl.com, NOAA, NASA, ESA) are retrieved and cached by this website's server itself. Your browser does not connect to these providers, and no data about you is transmitted to them.</p>
+      <p>Only when you click a link to an external website do you leave this website; the privacy policy of that provider then applies. No referrer is sent when you click such a link.</p>
+
+      <h2>Contact by e-mail</h2>
+      <p>If you send me an e-mail, I process your details (address, content) only to answer your request and delete them as soon as they are no longer needed for that purpose.</p>
+
+      <h2>Legal basis</h2>
+      <p>Processing is governed by the Swiss Federal Act on Data Protection (FADP). Where the EU General Data Protection Regulation (GDPR) applies, the processing of connection data is based on the legitimate interest in operating the website securely and reliably (Art. 6(1)(f) GDPR). The language choice is stored at your request and is necessary for the function you asked for. E-mails are processed on the basis of your request (Art. 6(1)(b) and (f) GDPR).</p>
+
+      <h2>Your rights</h2>
+      <p>You may ask whether and which personal data about you is processed, and request its correction or deletion. You may object to the processing; where the GDPR applies, you also have the right to restriction of processing and to data portability. Please contact the e-mail address given above. Since this website does not store any data about its visitors, there will usually be no data about you.</p>
+      <p>You have the right to lodge a complaint with a data protection supervisory authority – in Switzerland the <a href="https://www.edoeb.admin.ch/" rel="noopener noreferrer">Federal Data Protection and Information Commissioner (FDPIC)</a>, Feldeggweg 1, 3003 Bern; in the EU the supervisory authority of your country.</p>
+
+      <h2>Data security</h2>
+      <p>The connection to this website is encrypted with HTTPS. The server and software are protected by state-of-the-art technical and organisational measures and are updated regularly.</p>
+
+      <h2>Changes</h2>
+      <p>This privacy policy may be updated if the website or the legal situation changes. The version published here applies.</p>
+    </article>
+  </main>
+
+  <footer class="site-footer site-footer--legal">
+    <div class="layout site-footer__bottom">
+      <span><span data-i18n="meta.brand">Funkwetter</span> © <span id="year">2026</span></span>
+      <span class="site-footer__links">
+        <a href="impressum.html" data-i18n="footer.imprint">Impressum</a>
+        <a href="datenschutz.html" data-i18n="footer.privacy">Datenschutz</a>
+      </span>
+    </div>
+  </footer>
+</body>
+</html>

@@ -5,7 +5,6 @@
   const HOUR = 3600 * 1000;
   const IMAGE_STALE_MS = 6 * HOUR;
   const SVGNS = 'http://www.w3.org/2000/svg';
-  const LANGS = ['de', 'en'];
   const DICT = window.I18N;
 
   const $ = (sel) => document.querySelector(sel);
@@ -15,41 +14,9 @@
 
   // ------------------------------------------------------------------ Sprache
 
-  function storageGet(key) {
-    try {
-      return window.localStorage.getItem(key);
-    } catch {
-      return null;
-    }
-  }
-
-  function storageSet(key, value) {
-    try {
-      window.localStorage.setItem(key, value);
-    } catch {
-      /* z. B. privates Fenster – Sprache gilt dann nur für diesen Besuch */
-    }
-  }
-
-  function initialLang() {
-    const fromUrl = new URLSearchParams(window.location.search).get('lang');
-    if (LANGS.includes(fromUrl)) return fromUrl;
-    const saved = storageGet('lang');
-    if (LANGS.includes(saved)) return saved;
-    for (const l of navigator.languages || [navigator.language || '']) {
-      const base = String(l).slice(0, 2).toLowerCase();
-      if (LANGS.includes(base)) return base;
-    }
-    return 'de';
-  }
-
-  let lang = initialLang();
-
-  function t(key, params) {
-    let s = DICT[lang][key] ?? DICT.de[key] ?? key;
-    if (params) s = s.replace(/\{(\w+)\}/g, (m, k) => (k in params ? params[k] : m));
-    return s;
-  }
+  const L = window.SiteLang;
+  let lang = L.initial();
+  const t = L.translator(DICT, () => lang);
 
   // ------------------------------------------------------------------ Formate
 
@@ -931,22 +898,7 @@
   // ------------------------------------------------------------------ Sprache anwenden
 
   function applyStatic() {
-    document.documentElement.lang = DICT[lang].htmlLang;
-    document.title = t('meta.title');
-    document.querySelector('meta[name="description"]')?.setAttribute('content', t('meta.description'));
-    document.querySelectorAll('[data-i18n]').forEach((el) => {
-      el.textContent = t(el.dataset.i18n);
-    });
-    // Nur Texte aus dem eigenen Wörterbuch – nie Daten aus dem Feed
-    document.querySelectorAll('[data-i18n-html]').forEach((el) => {
-      el.innerHTML = t(el.dataset.i18nHtml);
-    });
-    document.querySelectorAll('[data-i18n-aria]').forEach((el) => {
-      el.setAttribute('aria-label', t(el.dataset.i18nAria));
-    });
-    document.querySelectorAll('[data-set-lang]').forEach((btn) => {
-      btn.setAttribute('aria-pressed', String(btn.dataset.setLang === lang));
-    });
+    L.applyStatic(DICT, lang, t, 'meta.title');
   }
 
   function renderAll() {
@@ -966,14 +918,10 @@
   }
 
   function setLang(next) {
-    if (!LANGS.includes(next) || next === lang) return;
+    if (!L.LANGS.includes(next) || next === lang) return;
     lang = next;
-    storageSet('lang', lang);
-    const url = new URL(window.location.href);
-    if (url.searchParams.has('lang')) {
-      url.searchParams.set('lang', lang);
-      history.replaceState(null, '', url);
-    }
+    L.save(lang);
+    L.syncUrl(lang);
     fmt = makeFormats();
     applyStatic();
     renderAll();

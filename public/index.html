@@ -10,6 +10,7 @@
   <link rel="preload" href="fonts/league-gothic-400.woff2" as="font" type="font/woff2" crossorigin>
   <link rel="stylesheet" href="styles.css">
   <script src="i18n.js" defer></script>
+  <script src="lang.js" defer></script>
   <script src="app.js" defer></script>
 </head>
 <body>
@@ -167,6 +168,7 @@
         <div class="gallery" id="gallery">
           <div class="placeholder" data-i18n="images.loading">Bilder werden geladen …</div>
         </div>
+        <p class="credits"><span data-i18n="images.credit">Bildnachweis:</span> SUVI, OVATION, D-RAP: NOAA SWPC. HMI: Courtesy of NASA/SDO and the AIA, EVE, and HMI science teams. LASCO C3: Courtesy of SOHO/LASCO consortium. SOHO is a project of international cooperation between ESA and NASA.</p>
       </div>
     </section>
 
@@ -394,7 +396,11 @@
     </div>
     <div class="layout site-footer__bottom">
       <span><span data-i18n="meta.brand">Funkwetter</span> © <span id="year">2026</span></span>
-      <a href="#top" data-i18n="footer.top">Nach oben</a>
+      <span class="site-footer__links">
+        <a href="impressum.html" data-i18n="footer.imprint">Impressum</a>
+        <a href="datenschutz.html" data-i18n="footer.privacy">Datenschutz</a>
+        <a href="#top" data-i18n="footer.top">Nach oben</a>
+      </span>
     </div>
   </footer>
 
