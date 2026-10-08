@@ -103,7 +103,7 @@ Den ausgegebenen Schlüssel auf GitHub eintragen: *Repository → Settings → D
 **«Allow write access» NICHT ankreuzen**.
 
 ```bash
-GIT_SSH_COMMAND="ssh -i /root/.ssh/propweather_deploy" git clone git@github.com:carlos-ngi/hamweather.git /opt/propweather
+GIT_SSH_COMMAND="ssh -i /root/.ssh/propweather_deploy" git clone git@github.com:carlos-ngi/propweather.git /opt/propweather
 ```
 
 Beim ersten Verbinden fragt SSH nach dem Fingerabdruck von github.com. Vergleichen mit
