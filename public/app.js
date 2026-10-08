@@ -390,31 +390,7 @@
 
   // ------------------------------------------------------------------ Ticker, Kopf, Hinweise
 
-  function renderTicker(d) {
-    const h = d.hamqsl;
-    const up = (key) => t(key).toLocaleUpperCase(fmt.locale);
-    const parts = [];
-    if (h) {
-      parts.push(`SFI ${fmtNum(h.solarFlux)}`, `SN ${fmtNum(h.sunspots)}`, `A ${fmtNum(h.aIndex)}`, `K ${fmtNum(h.kIndex)}`);
-      if (h.xray) parts.push(`X-RAY ${h.xray}`);
-      parts.push(`${up('ticker.wind')} ${fmtNum(h.solarWind)} km/s`, `Bz ${fmtNum(h.bz, 1)} nT`);
-      const geo = rateGeomag(h.geomagField);
-      if (geo) parts.push(`${up('ticker.geomag')} ${ratingText(geo).toLocaleUpperCase(fmt.locale)}`);
-      if (h.signalNoise) parts.push(`${up('ticker.noise')} ${h.signalNoise}`);
-      const good = h.bands.filter((b) => b.time === 'day' && /^good$/i.test(b.condition)).map((b) => bandLabel(b.name).replace(' – ', '–'));
-      if (good.length) parts.push(`${up('ticker.goodDay')}: ${good.join(', ')}`);
-      if (h.updated) parts.push(`${up('ticker.time')} ${utcTime(h.updated)}`);
-    } else {
-      parts.push(up('notice.hamqslDown'));
-    }
-    const html = parts.map((p) => `<span>${esc(p)}</span>`).join('');
-    $('#ticker').innerHTML = `<span class="ticker__item">${html}</span><span class="ticker__item">${html}</span>`;
-  }
-
   function renderStatus(d) {
-    const h = d.hamqsl;
-    $('#hero-meta').textContent = h?.updated ? t('hero.meta', { time: fmtStamp(h.updated), ago: fmtAgo(h.updated) }) : t('notice.hamqslDown');
-
     const failed = Object.entries(d.sources || {}).filter(([, s]) => !s.ok);
     const notice = $('#notice');
     if (failed.length) {
@@ -440,7 +416,7 @@
     const notice = $('#notice');
     notice.innerHTML = `<div><strong>${esc(t('notice.offline'))}</strong>${esc(t('notice.offlineText', { err: msg }))}</div>`;
     notice.hidden = false;
-    if (!state) $('#hero-meta').textContent = t('notice.failed');
+    if (!state) $('#werte-intro').textContent = t('notice.failed');
   }
 
   // ------------------------------------------------------------------ Diagramme
@@ -906,7 +882,7 @@
       if (lastFetchError) showFetchError(lastFetchError);
       return;
     }
-    for (const step of [renderStatus, renderIndices, renderTicker, renderBands, renderVhf, renderScales, renderGallery]) {
+    for (const step of [renderStatus, renderIndices, renderBands, renderVhf, renderScales, renderGallery]) {
       try {
         step(state);
       } catch (err) {

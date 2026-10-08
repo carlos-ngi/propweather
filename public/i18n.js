@@ -27,11 +27,7 @@ window.I18N = {
     'nav.glossary': 'Erklärungen',
     'lang.label': 'Sprache',
 
-    'hero.title': 'Sonne, Ionosphäre <br>&amp; Funkbedingungen',
-    'hero.lead': 'Solar-terrestrische Daten für Funkamateure – Solarflux, Sonnenflecken, geomagnetische Indizes, Röntgenfluss, Sonnenwind und die daraus berechneten Ausbreitungsbedingungen auf Kurzwelle und VHF.',
-    'hero.meta': 'Stand N0NBH: {time} · {ago}',
     'loading': 'Daten werden geladen …',
-    'loading.ticker': 'Lade aktuelle Werte …',
 
     'values.title': 'Aktuelle Werte',
     'values.intro': 'Quelle: N0NBH / hamqsl.com.',
@@ -264,11 +260,6 @@ window.I18N = {
     'err.too_large': 'Antwort zu gross',
     'err.http': 'HTTP-Fehler {code}',
 
-    'ticker.wind': 'Sonnenwind',
-    'ticker.geomag': 'Geomagnetik',
-    'ticker.noise': 'Störpegel',
-    'ticker.goodDay': 'Tagsüber gut',
-    'ticker.time': 'Stand',
 
     'ago.now': 'gerade eben',
     'ago.min': 'vor {n} Min.',
@@ -298,11 +289,7 @@ window.I18N = {
     'nav.glossary': 'Glossary',
     'lang.label': 'Language',
 
-    'hero.title': 'Sun, ionosphere <br>&amp; propagation',
-    'hero.lead': 'Solar-terrestrial data for radio amateurs – solar flux, sunspots, geomagnetic indices, X-ray flux, solar wind and the HF and VHF propagation conditions calculated from them.',
-    'hero.meta': 'N0NBH update: {time} · {ago}',
     'loading': 'Loading data …',
-    'loading.ticker': 'Loading current values …',
 
     'values.title': 'Current values',
     'values.intro': 'Source: N0NBH / hamqsl.com.',
@@ -535,11 +522,6 @@ window.I18N = {
     'err.too_large': 'Response too large',
     'err.http': 'HTTP error {code}',
 
-    'ticker.wind': 'Solar wind',
-    'ticker.geomag': 'Geomag',
-    'ticker.noise': 'Noise',
-    'ticker.goodDay': 'Good by day',
-    'ticker.time': 'Updated',
 
     'ago.now': 'just now',
     'ago.min': '{n} min ago',

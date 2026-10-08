@@ -204,27 +204,8 @@ html[lang="en"] [data-lang="de"] { display: none !important; }
   font-size: 1rem; border: 2px solid var(--ink); padding: 6px 14px;
 }
 
-/* ---------------------------------------------------------------- Ticker */
-
-.ticker { overflow: hidden; border-block: 0; }
-.ticker__track {
-  display: flex; width: max-content;
-  animation: ticker 60s linear infinite;
-}
-.ticker__item {
-  flex-shrink: 0;
-  font-family: var(--font-display);
-  font-size: clamp(1.6rem, 3vw, 2.4rem); line-height: 1;
-  padding: 14px 0; white-space: nowrap;
-}
-.ticker__item span { padding-inline: 18px; }
-.ticker__item span::after { content: "\2022"; padding-left: 36px; }
-@keyframes ticker { to { transform: translateX(-50%); } }
 @media (prefers-reduced-motion: reduce) {
   html { scroll-behavior: auto; }
-  .ticker__track { animation: none; flex-wrap: wrap; width: auto; }
-  .ticker__item:nth-child(2) { display: none; }
-  .ticker__item { white-space: normal; }
 }
 
 /* ---------------------------------------------------------------- Notice */
