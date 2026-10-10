@@ -553,3 +553,104 @@ html[lang="en"] [data-lang="de"] { display: none !important; }
 .legal__body li { margin-bottom: .5em; }
 .legal__body address { font-style: normal; margin: 0 0 1em; padding: 14px 18px; border: var(--border) solid var(--green); display: inline-block; }
 .legal__date { font-size: 1rem; color: var(--muted); }
+
+/* ---------------------------------------------------------------- Lage jetzt */
+
+.lage {
+  display: grid; gap: clamp(20px, 3vw, 40px);
+  grid-template-columns: minmax(0, 1.6fr) minmax(0, 1fr);
+  align-items: start;
+}
+@media (max-width: 900px) { .lage { grid-template-columns: 1fr; } }
+
+.summary { list-style: none; margin: 0; padding: 0; border-top: 2px solid var(--ink); }
+.summary__item {
+  display: grid; grid-template-columns: minmax(0, 11rem) minmax(0, 1fr); gap: 4px 20px;
+  padding: 12px 0 12px 18px; border-bottom: 2px solid var(--ink);
+  position: relative;
+}
+.summary__item::before {
+  content: ""; position: absolute; left: 0; top: 12px; bottom: 12px; width: 8px;
+  border: 1.5px solid var(--ink); background: var(--grey);
+}
+.summary__item--good::before { background: var(--green); }
+.summary__item--ok::before { background: var(--white); }
+.summary__item--warn::before { background: var(--orange); }
+.summary__item--bad::before { background: var(--red); }
+.summary__label { font-family: var(--font-display); text-transform: uppercase; font-size: 1.5rem; line-height: 1.1; }
+.summary__text { font-size: 1.05rem; line-height: 1.4; }
+.summary__text a { font-weight: 700; }
+@media (max-width: 560px) { .summary__item { grid-template-columns: 1fr; } }
+
+/* Standort */
+.qth { background: var(--white); border: var(--border) solid var(--ink); padding: 20px 22px; }
+.qth__title { font-family: var(--font-display); text-transform: uppercase; font-size: 2rem; line-height: 1; margin-bottom: 12px; }
+.qth__form label { display: block; font-weight: 700; font-size: .95rem; margin-bottom: 6px; }
+.qth__row { display: flex; gap: 8px; }
+.qth__row input {
+  flex: 1; min-width: 0;
+  font-family: var(--font-display); font-size: 1.6rem; letter-spacing: .06em; line-height: 1;
+  padding: 8px 12px 6px; border: 2px solid var(--ink); border-radius: 0; background: var(--white); color: var(--ink);
+}
+.qth__row input[aria-invalid="true"] { border-color: var(--red); }
+.qth__hint, .qth__note { font-size: .85rem; color: var(--muted); margin: 8px 0 0; }
+.qth__error { font-size: .9rem; color: #b00000; font-weight: 700; margin: 8px 0 0; }
+.qth__empty { margin: 16px 0 0; font-size: .95rem; }
+.qth__info { margin-top: 16px; }
+.qth__loc { margin: 0 0 8px; font-size: 1rem; }
+.qth__loc strong { font-family: var(--font-display); font-weight: 400; font-size: 1.6rem; letter-spacing: .04em; }
+.qth__sun { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; margin: 0 0 12px; font-size: .95rem; }
+.qth__times { width: 100%; border-collapse: collapse; font-size: .92rem; }
+.qth__times th, .qth__times td { text-align: left; padding: 6px 8px 6px 0; border-bottom: 1.5px solid var(--ink); vertical-align: top; }
+.qth__times th { font-weight: 700; white-space: nowrap; }
+
+.btn {
+  font-family: var(--font-display); text-transform: uppercase; font-size: 1.3rem; letter-spacing: .03em; line-height: 1;
+  padding: 9px 18px 7px; border: 2px solid var(--ink); background: var(--ink); color: var(--white); cursor: pointer;
+}
+.btn:hover { background: var(--white); color: var(--ink); }
+.btn--ghost { background: transparent; color: var(--ink); margin-top: 14px; font-size: 1.1rem; padding: 7px 14px 5px; }
+.btn--ghost:hover { background: var(--ink); color: var(--white); }
+
+/* Aktuelle Spalte in der Bandtabelle */
+.band-table th.is-now::after {
+  content: attr(data-now); margin-left: 8px; padding: 2px 6px 1px;
+  font-size: .8em; background: var(--ink); color: var(--white);
+}
+.band-table td.is-now { background: rgba(255, 255, 255, .28); }
+.band-table td.is-now .pill { outline: 3px solid var(--ink); outline-offset: 2px; }
+
+/* ---------------------------------------------------------------- Greyline-Karte */
+
+.map-card { margin: 0; background: var(--white); border: var(--border) solid var(--ink); padding: 14px 14px 12px; }
+.map canvas {
+  display: block; width: 100%; height: auto; aspect-ratio: 2 / 1;
+  background: var(--cyan); cursor: crosshair; touch-action: pan-y;
+}
+.swatch--day { background: var(--white); }
+.swatch--grey { background: #ffd200; }
+.swatch--night { background: #555; }
+.swatch--sun { background: var(--yellow); border-radius: 50%; border-width: 2px; }
+.swatch--qth { background: var(--red); border-radius: 50%; border-color: var(--ink); }
+
+/* ---------------------------------------------------------------- Prognosen & Meldungen */
+
+.chart-card--section { margin-top: 40px; }
+.c-point { fill: var(--white); stroke: var(--ink); stroke-width: 1.5; }
+.c-line--pred { stroke: var(--ink); stroke-width: 2; stroke-dasharray: 6 4; fill: none; }
+.c-area--pred { fill: var(--purple); fill-opacity: .45; stroke: none; }
+.swatch--pred-range { background: var(--purple); border-style: dashed; }
+
+.subhead { font-family: var(--font-display); text-transform: uppercase; font-weight: 400; font-size: 2rem; line-height: 1; margin: 48px 0 6px; }
+.alerts__note { font-size: .9rem; color: var(--muted); margin: 0 0 14px; }
+.alerts__list { list-style: none; margin: 0; padding: 0; border-top: 2px solid var(--ink); }
+.alert { padding: 14px 0; border-bottom: 2px solid var(--ink); }
+.alert__meta { display: flex; flex-wrap: wrap; align-items: center; gap: 6px 14px; font-size: .9rem; }
+.alert__meta .pill { font-size: 1.05rem; padding: 3px 8px 2px; }
+.alert__code { color: var(--muted); font-family: ui-monospace, Consolas, monospace; font-size: .85rem; }
+.alert__title { margin: 8px 0 4px; font-weight: 700; font-size: 1.05rem; }
+.alert details summary { cursor: pointer; font-size: .9rem; text-decoration: underline; text-underline-offset: 3px; width: max-content; }
+.alert pre {
+  margin: 10px 0 0; padding: 12px 14px; background: #f3f3f3; border-left: 4px solid var(--ink);
+  font-size: .82rem; line-height: 1.45; white-space: pre-wrap; overflow-wrap: anywhere;
+}

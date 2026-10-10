@@ -20,10 +20,11 @@
   <link rel="stylesheet" href="styles.css">
   <script src="i18n.js" defer></script>
   <script src="lang.js" defer></script>
+  <script src="geo.js" defer></script>
   <script src="app.js" defer></script>
 </head>
 <body>
-  <a class="skip-link" href="#werte" data-i18n="skip">Zum Inhalt springen</a>
+  <a class="skip-link" href="#lage" data-i18n="skip">Zum Inhalt springen</a>
 
   <header class="site-header">
     <div class="site-header__inner">
@@ -33,10 +34,11 @@
       </a>
       <div class="site-header__end">
         <nav class="site-nav" id="site-nav" data-i18n-aria="nav.label" aria-label="Hauptnavigation">
+          <a href="#lage" data-i18n="nav.now">Lage</a>
           <a href="#werte" data-i18n="nav.values">Werte</a>
-          <a href="#baender" data-i18n="nav.bands">KW-Bänder</a>
-          <a href="#vhf" data-i18n="nav.vhf">VHF</a>
-          <a href="#skalen" data-i18n="nav.scales">NOAA-Skalen</a>
+          <a href="#baender" data-i18n="nav.bands">Bänder</a>
+          <a href="#karte" data-i18n="nav.map">Karte</a>
+          <a href="#skalen" data-i18n="nav.forecast">Prognose</a>
           <a href="#verlauf" data-i18n="nav.history">Verlauf</a>
           <a href="#sonne" data-i18n="nav.images">Bilder</a>
           <a href="#erklaerungen" data-i18n="nav.glossary">Erklärungen</a>
@@ -56,10 +58,34 @@
   <main id="top">
     <div class="notice layout" id="notice" role="status" hidden></div>
 
+    <!-- Lage jetzt -->
+    <section class="section bg-yellow" id="lage" aria-labelledby="lage-title">
+      <div class="layout">
+        <h1 class="headline" id="lage-title" data-i18n="now.title">Lage jetzt</h1>
+        <p class="section__intro" id="lage-intro" data-i18n="now.intro">Zusammenfassung der aktuellen Daten von N0NBH und NOAA.</p>
+        <div class="lage">
+          <ul class="summary" id="summary"><li class="placeholder" data-i18n="loading">Daten werden geladen …</li></ul>
+          <aside class="qth" aria-labelledby="qth-title">
+            <h2 class="qth__title" id="qth-title" data-i18n="qth.title">Ihr Standort</h2>
+            <form class="qth__form" id="qth-form" novalidate>
+              <label for="qth-input" data-i18n="qth.label">Maidenhead-Locator</label>
+              <div class="qth__row">
+                <input id="qth-input" name="locator" type="text" autocomplete="off" autocapitalize="characters" spellcheck="false" maxlength="6" placeholder="JN47" aria-describedby="qth-hint">
+                <button type="submit" class="btn" data-i18n="qth.save">Übernehmen</button>
+              </div>
+              <p class="qth__hint" id="qth-hint" data-i18n="qth.hint">4 oder 6 Zeichen, z. B. JN47 oder JN47gj.</p>
+              <p class="qth__error" id="qth-error" role="alert" hidden></p>
+            </form>
+            <div class="qth__info" id="qth-info" aria-live="polite"></div>
+          </aside>
+        </div>
+      </div>
+    </section>
+
     <!-- Aktuelle Werte -->
     <section class="section" id="werte" aria-labelledby="werte-title">
       <div class="layout">
-        <h1 class="headline" id="werte-title" data-i18n="values.title">Aktuelle Werte</h1>
+        <h2 class="headline" id="werte-title" data-i18n="values.title">Aktuelle Werte</h2>
         <p class="section__intro" id="werte-intro" data-i18n="values.intro">Quelle: N0NBH / hamqsl.com.</p>
         <div class="boxes" id="indices">
           <div class="placeholder" data-i18n="loading">Daten werden geladen …</div>
@@ -95,10 +121,30 @@
       </div>
     </section>
 
+    <!-- Greyline-Karte -->
+    <section class="section bg-purple" id="karte" aria-labelledby="karte-title">
+      <div class="layout">
+        <h2 class="headline" id="karte-title" data-i18n="map.title">Greyline-Karte</h2>
+        <p class="section__intro" id="map-intro" data-i18n="map.intro">Tag, Nacht und Dämmerungszone.</p>
+        <figure class="map-card">
+          <div class="map" id="map">
+            <canvas id="map-canvas" role="img" data-i18n-aria="map.aria" aria-label="Weltkarte mit Tag, Nacht und Dämmerungszone"></canvas>
+          </div>
+          <ul class="legend">
+            <li><span class="swatch swatch--day"></span><span data-i18n="map.legend.day">Tag</span></li>
+            <li><span class="swatch swatch--grey"></span><span data-i18n="map.legend.grey">Dämmerung (Greyline)</span></li>
+            <li><span class="swatch swatch--night"></span><span data-i18n="map.legend.night">Nacht</span></li>
+            <li><span class="swatch swatch--sun"></span><span data-i18n="map.legend.sun">Sonne im Zenit</span></li>
+            <li><span class="swatch swatch--qth"></span><span data-i18n="map.legend.qth">Ihr Standort</span></li>
+          </ul>
+        </figure>
+      </div>
+    </section>
+
     <!-- NOAA-Skalen -->
     <section class="section" id="skalen" aria-labelledby="skalen-title">
       <div class="layout">
-        <h2 class="headline" id="skalen-title" data-i18n="scales.title">NOAA-Weltraumwetter-Skalen</h2>
+        <h2 class="headline" id="skalen-title" data-i18n="forecast.title">Prognosen &amp; Warnungen</h2>
         <p class="section__intro" data-i18n="scales.intro">R, S und G, Stufe 0 bis 5.</p>
         <div class="scales" id="scales-now"></div>
         <div class="table-wrap">
@@ -115,6 +161,24 @@
             </thead>
             <tbody></tbody>
           </table>
+        </div>
+
+        <figure class="chart-card chart-card--section">
+          <figcaption><h3 data-i18n="outlook.title">27-Tage-Prognose</h3><span id="outlook-caption" data-i18n="outlook.caption">Solarflux und grösster Kp pro Tag (NOAA SWPC)</span></figcaption>
+          <div class="chart" id="chart-outlook" role="img" data-i18n-aria="outlook.aria" aria-label="Diagramm der 27-Tage-Prognose"></div>
+          <ul class="legend">
+            <li><span class="swatch swatch--line"></span><span data-i18n="outlook.legend.flux">Solarflux (sfu)</span></li>
+            <li><span class="swatch swatch--good"></span><span data-i18n="legend.kp03">Kp 0–3</span></li>
+            <li><span class="swatch swatch--ok"></span><span data-i18n="legend.kp4">Kp 4</span></li>
+            <li><span class="swatch swatch--warn"></span><span data-i18n="legend.kp56">Kp 5–6 (G1–G2)</span></li>
+            <li><span class="swatch swatch--bad"></span><span data-i18n="legend.kp7">Kp 7+ (G3+)</span></li>
+          </ul>
+        </figure>
+
+        <div class="alerts">
+          <h3 class="subhead" data-i18n="alerts.title">NOAA-Meldungen der letzten 24 Stunden</h3>
+          <p class="alerts__note" data-i18n="alerts.note">Originaltext von NOAA SWPC (englisch).</p>
+          <ul class="alerts__list" id="alerts"><li class="placeholder" data-i18n="loading">Daten werden geladen …</li></ul>
         </div>
       </div>
     </section>
@@ -151,6 +215,15 @@
               <li><span class="swatch swatch--line"></span>Bz</li>
               <li><span class="swatch swatch--line-muted"></span>Bt</li>
               <li><span class="swatch swatch--south"></span><span data-i18n="chart.mag.south">Bz südwärts</span></li>
+            </ul>
+          </figure>
+          <figure class="chart-card chart-card--wide">
+            <figcaption><h3 data-i18n="cycle.title">Sonnenzyklus</h3><span id="cycle-caption" data-i18n="cycle.caption">Monatliche Sonnenfleckenzahl seit 2008 und NOAA-Prognose</span></figcaption>
+            <div class="chart" id="chart-cycle" role="img" data-i18n-aria="cycle.aria" aria-label="Diagramm des Sonnenzyklus"></div>
+            <ul class="legend">
+              <li><span class="swatch swatch--line-muted"></span><span data-i18n="cycle.legend.monthly">Monatswert</span></li>
+              <li><span class="swatch swatch--line"></span><span data-i18n="cycle.legend.smoothed">Geglättet (13 Monate)</span></li>
+              <li><span class="swatch swatch--pred-range"></span><span data-i18n="cycle.legend.forecast">NOAA-Prognose mit Bereich</span></li>
             </ul>
           </figure>
         </div>
@@ -265,6 +338,21 @@
           </div>
         </details>
         <details class="collapsible">
+          <summary><span class="layout">Greyline &amp; Locator</span></summary>
+          <div class="layout collapsible__body">
+            <p>Die <strong>Greyline</strong> ist die Dämmerungszone zwischen Tag und Nacht. Dort ist die D-Schicht, die tagsüber die tiefen Bänder dämpft, schon bzw. noch schwach, während die F-Schicht noch ionisiert ist. Entlang der Greyline gelingen deshalb auf den tiefen Bändern (160 m bis 40 m) oft weite Verbindungen – besonders zwischen Orten, die gleichzeitig in der Dämmerung liegen.</p>
+            <p>Auf der Karte zeigt die gelbe Zone die bürgerliche Dämmerung (Sonne 0° bis 6° unter dem Horizont), dunklere Flächen die Nacht. Das Sonnensymbol markiert den Ort, an dem die Sonne gerade senkrecht steht. Sonnenstand, Auf- und Untergang werden nach dem Verfahren des NOAA Solar Calculators berechnet und sind auf etwa eine Minute genau.</p>
+            <p>Der <strong>Maidenhead-Locator</strong> (QTH-Kenner) teilt die Erde in Felder (zwei Buchstaben, 20° × 10°), Quadrate (zwei Ziffern, 2° × 1°) und Kleinfelder (zwei Buchstaben, 5′ × 2,5′). JN47 umfasst zum Beispiel Zürich und Teile der Ostschweiz. Ihr Locator wird nur in Ihrem Browser gespeichert und nie übertragen.</p>
+          </div>
+        </details>
+        <details class="collapsible">
+          <summary><span class="layout">27-Tage-Prognose &amp; Sonnenzyklus</span></summary>
+          <div class="layout collapsible__body">
+            <p>Von der Erde aus gesehen dreht sich die Sonne in etwa 27 Tagen einmal um sich selbst. Aktive Regionen und koronale Löcher kehren deshalb oft nach rund 27 Tagen wieder. Darauf stützt sich die <strong>27-Tage-Prognose</strong>, die NOAA wöchentlich veröffentlicht: erwarteter Solarflux, A-Index und grösster Kp pro Tag. Sie eignet sich zur groben Planung, etwa von Contests oder Aktivierungen – einzelne Flares oder koronale Massenauswürfe kann sie nicht vorhersagen.</p>
+            <p>Der <strong>Sonnenzyklus</strong> dauert etwa elf Jahre. Zyklus 25 begann mit dem Minimum im Dezember 2019. Die Grafik zeigt die monatliche Sonnenfleckenzahl, das geglättete 13-Monats-Mittel (die Randmonate halb gewichtet; für die letzten sechs Monate gibt es deshalb noch keinen geglätteten Wert) und die Prognose von NOAA mit ihrem Unsicherheitsbereich.</p>
+          </div>
+        </details>
+        <details class="collapsible">
           <summary><span class="layout">Weitere Werte</span></summary>
           <div class="layout collapsible__body">
             <p><strong>304 Å</strong>: Relative Stärke der extremen UV-Strahlung bei 30,4 nm, ausgesandt vor allem von ionisiertem Helium (He II). Sie trägt wesentlich zur Ionisation der F-Schicht bei.</p>
@@ -361,6 +449,21 @@
           <div class="layout collapsible__body">
             <p>During strong geomagnetic activity, VHF signals can be scattered by the aurora (<strong>auroral propagation</strong>), typically with a rough, hissing tone. N0NBH distinguishes high-latitude aurora (above 60° N) and mid-latitude aurora (30–60° N).</p>
             <p><strong>Sporadic E</strong> (Es) occurs in Europe mainly from May to August. It allows contacts over typically 1000–2000 km (up to about 2300 km in a single hop) on 6 m and 4 m, and less often on 2 m.</p>
+          </div>
+        </details>
+        <details class="collapsible">
+          <summary><span class="layout">Greyline &amp; locator</span></summary>
+          <div class="layout collapsible__body">
+            <p>The <strong>greyline</strong> is the twilight zone between day and night. There, the D layer – which absorbs the low bands during the day – is already or still weak, while the F layer is still ionised. Along the greyline, long-distance contacts on the low bands (160 m to 40 m) are therefore often possible – especially between places that are in twilight at the same time.</p>
+            <p>On the map, the yellow zone shows civil twilight (sun 0° to 6° below the horizon), darker areas show night. The sun symbol marks the point where the sun is directly overhead. Sun position, sunrise and sunset are calculated with the method of the NOAA Solar Calculator and are accurate to about one minute.</p>
+            <p>The <strong>Maidenhead locator</strong> (grid square) divides the Earth into fields (two letters, 20° × 10°), squares (two digits, 2° × 1°) and subsquares (two letters, 5′ × 2.5′). JN47, for example, covers Zurich and parts of eastern Switzerland. Your locator is stored only in your browser and is never transmitted.</p>
+          </div>
+        </details>
+        <details class="collapsible">
+          <summary><span class="layout">27-day outlook &amp; solar cycle</span></summary>
+          <div class="layout collapsible__body">
+            <p>Seen from the Earth, the Sun rotates once in about 27 days. Active regions and coronal holes therefore often return after roughly 27 days. This is the basis of the <strong>27-day outlook</strong> that NOAA publishes weekly: expected solar flux, A-index and largest Kp per day. It is useful for rough planning, for example of contests or activations – it cannot predict individual flares or coronal mass ejections.</p>
+            <p>The <strong>solar cycle</strong> lasts about eleven years. Cycle 25 began with the minimum in December 2019. The chart shows the monthly sunspot number, the smoothed 13-month mean (edge months weighted by half; the last six months therefore have no smoothed value yet) and NOAA's forecast with its uncertainty range.</p>
           </div>
         </details>
         <details class="collapsible">
