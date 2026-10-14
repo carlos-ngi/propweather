@@ -42,6 +42,7 @@
           <a href="#verlauf" data-i18n="nav.history">Verlauf</a>
           <a href="#sonne" data-i18n="nav.images">Bilder</a>
           <a href="#erklaerungen" data-i18n="nav.glossary">Erklärungen</a>
+          <a href="links.html" data-i18n="nav.links">Links</a>
         </nav>
         <div class="lang-switch" role="group" data-i18n-aria="lang.label" aria-label="Sprache">
           <button type="button" data-set-lang="de" lang="de" aria-pressed="true">DE</button>
@@ -497,12 +498,34 @@
     <div class="layout site-footer__bottom">
       <span><span data-i18n="meta.brand">PropWeather</span> © <span id="year">2026</span></span>
       <span class="site-footer__links">
+        <a href="links.html" data-i18n="footer.links">Links</a>
         <a href="impressum.html" data-i18n="footer.imprint">Impressum</a>
         <a href="datenschutz.html" data-i18n="footer.privacy">Datenschutz</a>
         <a href="#top" data-i18n="footer.top">Nach oben</a>
       </span>
     </div>
   </footer>
+
+  <dialog class="lightbox" id="lightbox" aria-labelledby="lightbox-title">
+    <div class="lightbox__inner">
+      <div class="lightbox__media" id="lightbox-media"></div>
+      <div class="lightbox__info">
+        <div class="lightbox__head">
+          <h2 class="lightbox__title" id="lightbox-title"></h2>
+          <button class="lightbox__close" type="button" id="lightbox-close" data-i18n-aria="lightbox.close" aria-label="Schliessen"><span aria-hidden="true">×</span></button>
+        </div>
+        <p class="lightbox__caption" id="lightbox-caption"></p>
+        <p class="lightbox__text" id="lightbox-text"></p>
+        <div class="tile__meta" id="lightbox-meta"></div>
+        <p class="lightbox__credit" id="lightbox-credit"></p>
+        <div class="lightbox__links" id="lightbox-links"></div>
+        <div class="lightbox__nav">
+          <button type="button" id="lightbox-prev" data-i18n="lightbox.prev">← Vorheriges</button>
+          <button type="button" id="lightbox-next" data-i18n="lightbox.next">Nächstes →</button>
+        </div>
+      </div>
+    </div>
+  </dialog>
 
   <div class="tooltip" id="tooltip" role="presentation" hidden></div>
 </body>

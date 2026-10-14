@@ -56,10 +56,11 @@ server.js            Node-Server: statische Dateien, /api/data, /img/<id>, /heal
 public/index.html    Seite (inkl. Erklärungen DE/EN)
 public/impressum.html, public/datenschutz.html
                      Impressum und Datenschutzerklärung (DE/EN, Betreiberdaten aus operator.json)
+public/links.html    Nützliche Links nach Kategorien (DE/EN)
 public/i18n.js       Texte Deutsch/Englisch
 public/lang.js       Sprachwahl (gemeinsam für alle Seiten)
 public/app.js        Darstellung, Diagramme (SVG, ohne Bibliotheken), Auto-Refresh
-public/legal.js      Sprachwahl für Impressum und Datenschutz
+public/legal.js      Sprachwahl für Impressum, Datenschutz und Links
 operator.json        Angaben zum Betreiber für Impressum und Datenschutz
 operator.example.json  Vorlage für eine eigene operator.json
 public/styles.css    Gestaltung

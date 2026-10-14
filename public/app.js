@@ -1484,7 +1484,43 @@
 
   // ------------------------------------------------------------------ Bilder
 
+  // Herkunft der Bilder: Produktseite beim Datenlieferanten und Originaldatei
+  const IMAGE_SOURCES = {
+    suvi304: {
+      page: 'https://www.swpc.noaa.gov/products/goes-solar-ultraviolet-imager-suvi',
+      file: 'https://services.swpc.noaa.gov/images/animations/suvi/primary/304/latest.png',
+      credit: 'NOAA SWPC',
+    },
+    suvi195: {
+      page: 'https://www.swpc.noaa.gov/products/goes-solar-ultraviolet-imager-suvi',
+      file: 'https://services.swpc.noaa.gov/images/animations/suvi/primary/195/latest.png',
+      credit: 'NOAA SWPC',
+    },
+    hmi: {
+      page: 'https://sdo.gsfc.nasa.gov/data/',
+      file: 'https://soho.nascom.nasa.gov/data/realtime/hmi_igr/1024/latest.jpg',
+      credit: 'Courtesy of NASA/SDO and the AIA, EVE, and HMI science teams.',
+    },
+    lasco: {
+      page: 'https://soho.nascom.nasa.gov/data/realtime-images.html',
+      file: 'https://soho.nascom.nasa.gov/data/realtime/c3/1024/latest.jpg',
+      credit: 'Courtesy of SOHO/LASCO consortium. SOHO is a project of international cooperation between ESA and NASA.',
+    },
+    aurora: {
+      page: 'https://www.swpc.noaa.gov/products/aurora-30-minute-forecast',
+      file: 'https://services.swpc.noaa.gov/images/animations/ovation/north/latest.jpg',
+      credit: 'NOAA SWPC',
+    },
+    drap: {
+      page: 'https://www.swpc.noaa.gov/products/d-region-absorption-predictions-d-rap',
+      file: 'https://services.swpc.noaa.gov/images/animations/d-rap/global/latest.png',
+      credit: 'NOAA SWPC',
+    },
+  };
+
   let galleryKey = '';
+  let galleryImages = [];
+  let lightboxIndex = -1;
 
   function imageMeta(img) {
     if (!img.available) return `<span class="pill pill--bad">${esc(t('images.imgUnavailable'))}</span>`;
@@ -1494,14 +1530,23 @@
     return `${stale ? `<span class="pill pill--warn">${esc(t('images.stale'))}</span>` : ''}<span>${esc(when)}</span>`;
   }
 
+  function sourceLinks(id) {
+    const src = IMAGE_SOURCES[id];
+    if (!src) return '';
+    return `<a href="${esc(src.page)}" target="_blank" rel="noopener noreferrer">${esc(t('lightbox.source'))} ↗</a>
+      <a href="${esc(src.file)}" target="_blank" rel="noopener noreferrer">${esc(t('lightbox.original'))} ↗</a>`;
+  }
+
   function renderGallery(d) {
     const images = d.images;
     const gallery = $('#gallery');
     if (!Array.isArray(images) || !images.length) {
       gallery.innerHTML = `<div class="placeholder">${esc(t('images.unavailable'))}</div>`;
       galleryKey = '';
+      galleryImages = [];
       return;
     }
+    galleryImages = images;
     const key = `${lang}|${images.map((i) => `${i.id}:${i.version}`).join('|')}`;
     if (key === galleryKey) {
       // Nur die Zeitangaben auffrischen
@@ -1509,18 +1554,22 @@
         const meta = gallery.querySelector(`.tile[data-id="${CSS.escape(img.id)}"] .tile__meta`);
         if (meta) meta.innerHTML = imageMeta(img);
       }
+      if (lightboxIndex >= 0) fillLightbox();
       return;
     }
     galleryKey = key;
     gallery.innerHTML = images
-      .map((img) => {
+      .map((img, i) => {
         const id = esc(img.id);
         const media = img.available
-          ? `<img src="img/${id}?v=${esc(img.version || '')}" alt="${esc(t(`img.${img.id}.alt`))}" loading="lazy" decoding="async">`
+          ? `<button class="tile__zoom" type="button" data-index="${i}" aria-label="${esc(t('lightbox.open', { title: t(`img.${img.id}.title`) }))}">
+              <img src="img/${id}?v=${esc(img.version || '')}" alt="${esc(t(`img.${img.id}.alt`))}" loading="lazy" decoding="async">
+            </button>`
           : `<div class="tile__error">${esc(t('images.imgUnavailable'))}</div>`;
         return `<figure class="tile" data-id="${id}">
             ${media}
-            <figcaption><strong>${esc(t(`img.${img.id}.title`))}</strong>${esc(t(`img.${img.id}.caption`))}<div class="tile__meta">${imageMeta(img)}</div></figcaption>
+            <figcaption><strong>${esc(t(`img.${img.id}.title`))}</strong>${esc(t(`img.${img.id}.caption`))}<div class="tile__meta">${imageMeta(img)}</div>
+            <div class="tile__links">${sourceLinks(img.id)}</div></figcaption>
           </figure>`;
       })
       .join('');
@@ -1531,10 +1580,77 @@
           const div = document.createElement('div');
           div.className = 'tile__error';
           div.textContent = t('images.imgUnavailable');
-          el.replaceWith(div);
+          (el.closest('.tile__zoom') || el).replaceWith(div);
         },
         { once: true },
       );
+    });
+    if (lightboxIndex >= 0) fillLightbox();
+  }
+
+  // ------------------------------------------------------------------ Detailansicht
+
+  function fillLightbox() {
+    const img = galleryImages[lightboxIndex];
+    if (!img) return;
+    const src = IMAGE_SOURCES[img.id];
+    $('#lightbox-title').textContent = t(`img.${img.id}.title`);
+    $('#lightbox-caption').textContent = t(`img.${img.id}.caption`);
+    $('#lightbox-text').textContent = t(`img.${img.id}.detail`);
+    $('#lightbox-meta').innerHTML = imageMeta(img);
+    $('#lightbox-credit').textContent = src ? `${t('images.credit')} ${src.credit}` : '';
+    $('#lightbox-links').innerHTML = sourceLinks(img.id);
+    const media = $('#lightbox-media');
+    const url = `img/${img.id}?v=${img.version || ''}`;
+    const current = media.querySelector('img');
+    if (!img.available) {
+      media.innerHTML = `<div class="tile__error">${esc(t('images.imgUnavailable'))}</div>`;
+    } else if (!current || current.getAttribute('src') !== url) {
+      media.innerHTML = `<img src="${esc(url)}" alt="${esc(t(`img.${img.id}.alt`))}">`;
+    } else {
+      current.alt = t(`img.${img.id}.alt`);
+    }
+    const many = galleryImages.length > 1;
+    $('#lightbox-prev').hidden = !many;
+    $('#lightbox-next').hidden = !many;
+  }
+
+  function openLightbox(index) {
+    const dialog = $('#lightbox');
+    lightboxIndex = index;
+    fillLightbox();
+    if (!dialog.open) dialog.showModal();
+    document.documentElement.classList.add('has-dialog');
+  }
+
+  function stepLightbox(delta) {
+    if (lightboxIndex < 0 || !galleryImages.length) return;
+    lightboxIndex = (lightboxIndex + delta + galleryImages.length) % galleryImages.length;
+    fillLightbox();
+  }
+
+  function setupLightbox() {
+    const dialog = $('#lightbox');
+    $('#gallery').addEventListener('click', (e) => {
+      const btn = e.target.closest('.tile__zoom');
+      if (btn) openLightbox(Number(btn.dataset.index));
+    });
+    $('#lightbox-close').addEventListener('click', () => dialog.close());
+    $('#lightbox-prev').addEventListener('click', () => stepLightbox(-1));
+    $('#lightbox-next').addEventListener('click', () => stepLightbox(1));
+    // Klick auf den abgedunkelten Hintergrund schliesst
+    dialog.addEventListener('click', (e) => {
+      if (e.target === dialog) dialog.close();
+    });
+    dialog.addEventListener('keydown', (e) => {
+      if (e.key === 'ArrowLeft') stepLightbox(-1);
+      else if (e.key === 'ArrowRight') stepLightbox(1);
+    });
+    dialog.addEventListener('close', () => {
+      const tile = galleryImages[lightboxIndex] && $(`#gallery .tile[data-id="${CSS.escape(galleryImages[lightboxIndex].id)}"] .tile__zoom`);
+      lightboxIndex = -1;
+      document.documentElement.classList.remove('has-dialog');
+      tile?.focus();
     });
   }
 
@@ -1627,6 +1743,7 @@
   applyStatic();
   $('#year').textContent = String(new Date().getFullYear());
   setupNav();
+  setupLightbox();
   setupQth();
   setupMap();
   renderQth();
