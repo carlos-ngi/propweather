@@ -43,10 +43,7 @@ in [`public/index.html`](public/index.html) (Blöcke mit `data-lang`).
 | KW-Bänder | Bandbedingungen Tag/Nacht, geomagnetisches Feld, Störpegel, MUF, foF2 | N0NBH |
 | VHF | Aurora, E-Skip Europa 6 m / 4 m / 2 m, Nordamerika 2 m | N0NBH |
 | NOAA-Skalen | R/S/G aktuell und 3-Tage-Prognose | NOAA SWPC |
-| Lage jetzt | Zusammenfassung in Klartext, beste Bänder am eigenen Standort (Maidenhead-Locator), Auf-/Untergang und Greyline-Fenster | N0NBH, NOAA SWPC, eigene Berechnung |
-| Greyline-Karte | Tag, Dämmerung und Nacht weltweit, Subsolarpunkt, eigener Standort, Locator beim Zeigen | Natural Earth (gemeinfrei), eigene Berechnung |
-| Prognosen & Warnungen | 27-Tage-Prognose (Solarflux, Kp), NOAA-Meldungen der letzten 24 h | NOAA SWPC |
-| Verlauf | Kp (beobachtet + Prognose), Röntgenfluss 24 h, Sonnenwind 24 h, Bz/Bt 24 h, Sonnenzyklus seit 2008 mit Prognose | NOAA SWPC |
+| Verlauf | Kp (beobachtet + Prognose), Röntgenfluss 24 h, Sonnenwind 24 h, Bz/Bt 24 h | NOAA SWPC |
 | Bilder | GOES/SUVI 304 Å und 195 Å, SDO/HMI, SOHO/LASCO C3, Polarlicht-Oval, D-RAP | NOAA, NASA, ESA |
 
 ## Aufbau

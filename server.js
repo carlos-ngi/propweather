@@ -304,87 +304,6 @@ function parseFlares(rows) {
   };
 }
 
-// 27-Tage-Prognose (Textprodukt 27DO): "2026 Oct 05      92          18          5"
-function parseOutlook(text) {
-  if (typeof text !== 'string' || !text.includes('27-day')) throw new SourceError('invalid');
-  const issued = /:Issued:\s+(\d{4}) (\w{3}) (\d{2}) (\d{2})(\d{2}) UTC/.exec(text);
-  const days = [];
-  for (const m of text.matchAll(/^(\d{4}) ([A-Z][a-z]{2}) (\d{2})\s+(\d+)\s+(\d+)\s+(\d+)\s*$/gm)) {
-    if (!(m[2] in MONTHS)) continue;
-    const kp = Number(m[6]);
-    days.push({
-      date: new Date(Date.UTC(+m[1], MONTHS[m[2]], +m[3])).toISOString().slice(0, 10),
-      flux: Number(m[4]),
-      ap: Number(m[5]),
-      kp: kp >= 0 && kp <= 9 ? kp : null,
-    });
-  }
-  if (!days.length) throw new SourceError('invalid');
-  return {
-    issued: issued ? new Date(Date.UTC(+issued[1], MONTHS[issued[2]], +issued[3], +issued[4], +issued[5])).toISOString() : null,
-    days: days.slice(0, 30),
-  };
-}
-
-// Meldungen (Alerts, Warnings, Watches, Summaries) der letzten 48 Stunden
-const ALERT_HEADLINE = /^(?:ALERT|WARNING|WATCH|SUMMARY|EXTENDED WARNING|CONTINUED ALERT|CANCEL[A-Z ]*|ALERT EXTENSION)\b[^\r\n]*/m;
-
-function parseAlerts(rows) {
-  if (!Array.isArray(rows)) throw new SourceError('invalid');
-  const since = Date.now() - 48 * 3600000;
-  const latest = new Map(); // Code + Seriennummer -> neueste Fassung (Korrekturen ersetzen das Original)
-  for (const r of rows) {
-    if (typeof r?.message !== 'string' || typeof r?.issue_datetime !== 'string') continue;
-    const issued = parseUtc(r.issue_datetime.replace(' ', 'T'));
-    if (!Number.isFinite(issued) || issued < since) continue;
-    const message = r.message.replace(/\r/g, '').trim().slice(0, 3000);
-    const code = (/Space Weather Message Code:\s*([A-Z0-9]+)/.exec(message) || [])[1] || String(r.product_id || '').slice(0, 12);
-    const serial = (/Serial Number:\s*(\d+)/.exec(message) || [])[1] || '';
-    const headline = ((ALERT_HEADLINE.exec(message) || [])[0] || '').trim().slice(0, 200);
-    const key = `${code}#${serial}`;
-    const prev = latest.get(key);
-    if (!prev || issued > Date.parse(prev.issued)) {
-      latest.set(key, { code: clip(code, 12), serial: clip(serial, 10), issued: new Date(issued).toISOString(), headline, message });
-    }
-  }
-  return [...latest.values()].sort((a, b) => Date.parse(b.issued) - Date.parse(a.issued)).slice(0, 25);
-}
-
-// Sonnenzyklus: Monatswerte ab 2008 (Beginn Zyklus 24) plus NOAA-Prognose
-function smooth13(values) {
-  // Klassisches geglättetes Monatsmittel (13 Monate, Randmonate halb gewichtet)
-  return values.map((_, i) => {
-    if (i < 6 || i + 6 >= values.length) return null;
-    let sum = 0;
-    for (let k = -6; k <= 6; k++) {
-      const v = values[i + k];
-      if (v === null) return null;
-      sum += Math.abs(k) === 6 ? v / 2 : v;
-    }
-    return Math.round((sum / 12) * 10) / 10;
-  });
-}
-
-const valid = (v) => (typeof v === 'number' && v >= 0 ? v : null);
-
-function parseCycleObserved(rows) {
-  if (!Array.isArray(rows)) throw new SourceError('invalid');
-  const months = rows
-    .filter((r) => typeof r?.['time-tag'] === 'string' && /^\d{4}-\d{2}$/.test(r['time-tag']) && r['time-tag'] >= '2007-07')
-    .map((r) => ({ t: r['time-tag'], ssn: valid(r.ssn) }));
-  const smooth = smooth13(months.map((m) => m.ssn));
-  return months
-    .map((m, i) => ({ ...m, smoothed: smooth[i] }))
-    .filter((m) => m.t >= '2008-01');
-}
-
-function parseCyclePredicted(rows) {
-  if (!Array.isArray(rows)) throw new SourceError('invalid');
-  return rows
-    .filter((r) => typeof r?.['time-tag'] === 'string' && /^\d{4}-\d{2}$/.test(r['time-tag']))
-    .map((r) => ({ t: r['time-tag'], ssn: valid(r.predicted_ssn), low: valid(r.low_ssn), high: valid(r.high_ssn) }));
-}
-
 // ---------------------------------------------------------------------------
 // Bilder – werden vom Server geholt und unter /img/<id> ausgeliefert.
 // Texte (Titel, Beschreibung) stehen mehrsprachig im Frontend.
@@ -440,10 +359,6 @@ const SOURCES = {
   wind: { url: `${SWPC}/json/rtsw/rtsw_wind_1m.json`, ttl: 5 * MIN, format: 'json', max: 20 * MB, parse: parseWind },
   mag: { url: `${SWPC}/json/rtsw/rtsw_mag_1m.json`, ttl: 5 * MIN, format: 'json', max: 20 * MB, parse: parseMag },
   scales: { url: `${SWPC}/products/noaa-scales.json`, ttl: 10 * MIN, format: 'json', max: 1 * MB, parse: parseScales },
-  outlook: { url: `${SWPC}/text/27-day-outlook.txt`, ttl: 60 * MIN, format: 'text', max: 1 * MB, parse: parseOutlook },
-  alerts: { url: `${SWPC}/products/alerts.json`, ttl: 5 * MIN, format: 'json', max: 2 * MB, parse: parseAlerts },
-  cycle: { url: `${SWPC}/json/solar-cycle/observed-solar-cycle-indices.json`, ttl: 12 * 60 * MIN, format: 'json', max: 5 * MB, parse: parseCycleObserved },
-  cycleForecast: { url: `${SWPC}/json/solar-cycle/predicted-solar-cycle.json`, ttl: 12 * 60 * MIN, format: 'json', max: 1 * MB, parse: parseCyclePredicted },
   images: { ttl: 10 * MIN, load: loadImages },
 };
 
@@ -528,7 +443,6 @@ const MIME = {
   '.woff2': 'font/woff2',
   '.txt': 'text/plain; charset=utf-8',
   '.xml': 'application/xml; charset=utf-8',
-  '.json': 'application/json; charset=utf-8',
 };
 
 // Angaben zum Betreiber für Impressum und Datenschutz – liegen in operator.json.

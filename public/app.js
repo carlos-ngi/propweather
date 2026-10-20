@@ -39,8 +39,6 @@
       utcDay: new Intl.DateTimeFormat(locale, { ...dayOpts, ...utc }),
       utcDayMonth: new Intl.DateTimeFormat(locale, { ...dmOpts, ...utc }),
       utcFull: new Intl.DateTimeFormat(locale, { ...dayOpts, ...h23, ...utc }),
-      utcMonth: new Intl.DateTimeFormat(locale, { month: 'short', year: 'numeric', ...utc }),
-      localTime: new Intl.DateTimeFormat(locale, h23),
     };
   }
 
@@ -210,8 +208,7 @@
   const ratingText = (r) => (r.text !== undefined ? r.text : t(r.key, r.params));
   const pill = (r) => (r ? `<span class="pill pill--${r.level}">${esc(ratingText(r))}</span>` : '');
   const scaleWord = (w) => (w ? t(`scale.${w}`) : '–');
-  // Geschützte Leerzeichen: «30 m – 20 m» wird nie mitten im Band umbrochen
-  const bandLabel = (n) => n.trim().replace(/m/g, ' m').replace(/\s*-\s*/, ' – ');
+  const bandLabel = (n) => n.replace(/m/g, ' m').replace(/\s*-\s*/, ' – ').trim();
 
   // ------------------------------------------------------------------ Rendering: Werte
 
@@ -307,16 +304,9 @@
     } else {
       const names = [...new Set(h.bands.map((b) => b.name))];
       const cond = (name, time) => h.bands.find((b) => b.name === name && b.time === time)?.condition;
-      const period = qthPeriod();
-      const cell = (n, time) => `<td${period === time ? ' class="is-now"' : ''}>${pill(rateBand(cond(n, time)))}</td>`;
       tbody.innerHTML = names
-        .map((n) => `<tr><th scope="row">${esc(bandLabel(n))}</th>${cell(n, 'day')}${cell(n, 'night')}</tr>`)
+        .map((n) => `<tr><th scope="row">${esc(bandLabel(n))}</th><td>${pill(rateBand(cond(n, 'day')))}</td><td>${pill(rateBand(cond(n, 'night')))}</td></tr>`)
         .join('');
-      const heads = document.querySelectorAll('#band-table thead th');
-      [['day', 1], ['night', 2]].forEach(([time, i]) => {
-        heads[i]?.classList.toggle('is-now', period === time);
-        heads[i]?.setAttribute('data-now', t('bands.now'));
-      });
     }
 
     const facts = $('#hf-facts');
@@ -589,7 +579,14 @@
 
       tooltip.innerHTML = describe(p);
       tooltip.hidden = false;
-      placeTooltip(tooltip, ev);
+      const tw = tooltip.offsetWidth;
+      const th = tooltip.offsetHeight;
+      let left = ev.clientX + 14;
+      if (left + tw > window.innerWidth - 8) left = ev.clientX - tw - 14;
+      let top = ev.clientY - th - 12;
+      if (top < 8) top = ev.clientY + 16;
+      tooltip.style.left = `${Math.max(8, left)}px`;
+      tooltip.style.top = `${top}px`;
     };
 
     svg.addEventListener('pointermove', move);
@@ -809,675 +806,11 @@
 
   function drawCharts() {
     if (!state) return;
-    for (const draw of [
-      () => drawKp(state.kp),
-      () => drawXray(state.xray),
-      () => drawWind(state.wind),
-      () => drawMag(state.mag),
-      () => drawOutlook(state.outlook),
-      () => drawCycle(state.cycle, state.cycleForecast),
-    ]) {
+    for (const draw of [() => drawKp(state.kp), () => drawXray(state.xray), () => drawWind(state.wind), () => drawMag(state.mag)]) {
       try {
         draw();
       } catch (err) {
         console.error(err);
-      }
-    }
-  }
-
-  // ------------------------------------------------------------------ Standort (Locator)
-
-  const Geo = window.Geo;
-  const QTH_KEY = 'qth';
-  const RAD = Math.PI / 180;
-  const DEG = 180 / Math.PI;
-
-  // Der Locator wird nur im Browser gespeichert (localStorage) und nie übertragen.
-  function storeGet(key) {
-    try {
-      return window.localStorage.getItem(key);
-    } catch {
-      return null;
-    }
-  }
-  function storeSet(key, value) {
-    try {
-      window.localStorage.setItem(key, value);
-    } catch {
-      /* z. B. privates Fenster – gilt dann nur für diesen Besuch */
-    }
-  }
-  function storeDel(key) {
-    try {
-      window.localStorage.removeItem(key);
-    } catch {
-      /* nichts zu tun */
-    }
-  }
-
-  let qth = Geo.locatorToLatLon(storeGet(QTH_KEY));
-
-  // Tag ab Sonnenaufgang (−0,833°), Dämmerung bis −6° (bürgerlich), darunter Nacht
-  function sunState(el) {
-    if (el >= -0.833) return 'day';
-    if (el >= -6) return 'grey';
-    return 'night';
-  }
-
-  const qthPeriod = () => (qth ? sunState(Geo.sunElevation(qth.lat, qth.lon, Date.now())) : null);
-
-  function fmtCoord(lat, lon, digits = 2) {
-    return `${fmtNum(Math.abs(lat), digits)}° ${t(lat >= 0 ? 'qth.n' : 'qth.s')}, ${fmtNum(Math.abs(lon), digits)}° ${t(lon >= 0 ? 'qth.e' : 'qth.w')}`;
-  }
-
-  function fmtEvent(ms) {
-    if (ms === null) return '–';
-    const d = new Date(ms);
-    return `${fmt.utcTime.format(d)} UTC (${fmt.localTime.format(d)})`;
-  }
-
-  function fmtRange(a, b) {
-    if (a === null || b === null) return fmtEvent(a ?? b);
-    const da = new Date(a);
-    const db = new Date(b);
-    return `${fmt.utcTime.format(da)}–${fmt.utcTime.format(db)} UTC (${fmt.localTime.format(da)}–${fmt.localTime.format(db)})`;
-  }
-
-  function renderQth() {
-    const info = $('#qth-info');
-    const input = $('#qth-input');
-    const error = $('#qth-error');
-    if (!error.hidden) error.textContent = t('qth.error');
-    if (document.activeElement !== input && !input.getAttribute('aria-invalid')) input.value = qth ? qth.locator : '';
-    if (!qth) {
-      info.innerHTML = `<p class="qth__empty">${esc(t('qth.empty'))}</p>`;
-      return;
-    }
-    const now = Date.now();
-    const el = Geo.sunElevation(qth.lat, qth.lon, now);
-    const st = sunState(el);
-    const times = Geo.sunTimes(qth.lat, qth.lon, now);
-    const level = { day: 'good', grey: 'ok', night: 'neutral' }[st];
-    const rows = times.polar
-      ? `<p>${esc(t(times.polar === 'day' ? 'qth.polarDay' : 'qth.polarNight'))}</p>`
-      : `<table class="qth__times"><tbody>
-          <tr><th scope="row">${esc(t('qth.greyMorning'))}</th><td>${esc(fmtRange(times.dawn, times.sunrise))}</td></tr>
-          <tr><th scope="row">${esc(t('qth.sunrise'))}</th><td>${esc(fmtEvent(times.sunrise))}</td></tr>
-          <tr><th scope="row">${esc(t('qth.sunset'))}</th><td>${esc(fmtEvent(times.sunset))}</td></tr>
-          <tr><th scope="row">${esc(t('qth.greyEvening'))}</th><td>${esc(fmtRange(times.sunset, times.dusk))}</td></tr>
-        </tbody></table>
-        <p class="qth__note">${esc(t('qth.timesNote'))}</p>`;
-    info.innerHTML = `
-      <p class="qth__loc"><strong>${esc(qth.locator)}</strong> · ${esc(fmtCoord(qth.lat, qth.lon))}</p>
-      <p class="qth__sun">${pill({ level, key: `sun.${st}` })} <span>${esc(t('qth.sunNow', { el: fmtNum(el, 0) }))}</span></p>
-      ${rows}
-      <button type="button" class="btn btn--ghost" id="qth-remove">${esc(t('qth.remove'))}</button>`;
-  }
-
-  function onQthChange() {
-    renderQth();
-    if (state) {
-      for (const step of [renderSummary, renderBands]) {
-        try {
-          step(state);
-        } catch (err) {
-          console.error(err);
-        }
-      }
-    }
-    drawMap();
-  }
-
-  function setupQth() {
-    const form = $('#qth-form');
-    const input = $('#qth-input');
-    const error = $('#qth-error');
-    form.addEventListener('submit', (e) => {
-      e.preventDefault();
-      const value = input.value.trim();
-      if (!value) {
-        qth = null;
-        storeDel(QTH_KEY);
-      } else {
-        const p = Geo.locatorToLatLon(value);
-        if (!p) {
-          error.textContent = t('qth.error');
-          error.hidden = false;
-          input.setAttribute('aria-invalid', 'true');
-          return;
-        }
-        qth = p;
-        storeSet(QTH_KEY, p.locator);
-      }
-      error.hidden = true;
-      input.removeAttribute('aria-invalid');
-      input.value = qth ? qth.locator : '';
-      onQthChange();
-    });
-    $('#qth-info').addEventListener('click', (e) => {
-      if (!e.target.closest('#qth-remove')) return;
-      qth = null;
-      storeDel(QTH_KEY);
-      onQthChange();
-      input.focus();
-    });
-  }
-
-  // ------------------------------------------------------------------ Lage jetzt (Zusammenfassung)
-
-  const LEVEL_RANK = { neutral: 0, good: 1, ok: 2, warn: 3, bad: 4 };
-  const worse = (a, b) => (LEVEL_RANK[b] > LEVEL_RANK[a] ? b : a);
-
-  function listFmt(items) {
-    try {
-      return new Intl.ListFormat(fmt.locale, { style: 'long', type: 'conjunction' }).format(items);
-    } catch {
-      return items.join(', ');
-    }
-  }
-
-  const bandsWith = (h, time, cond) =>
-    h.bands.filter((b) => b.time === time && b.condition.trim().toLowerCase() === cond).map((b) => bandLabel(b.name));
-
-  function hfRow(h, time) {
-    const good = bandsWith(h, time, 'good');
-    const fair = bandsWith(h, time, 'fair');
-    const poor = bandsWith(h, time, 'poor');
-    const parts = [];
-    if (good.length) parts.push(t('sum.good', { list: listFmt(good) }));
-    if (fair.length) parts.push(t('sum.fair', { list: listFmt(fair) }));
-    if (poor.length) parts.push(t('sum.poor', { list: listFmt(poor) }));
-    return {
-      label: t(time === 'day' ? 'sum.hfDay' : 'sum.hfNight'),
-      level: good.length ? 'good' : fair.length ? 'ok' : 'bad',
-      text: parts.join(' · ') || '–',
-    };
-  }
-
-  function bestBands(h, time) {
-    const good = bandsWith(h, time, 'good');
-    if (good.length) return { level: 'good', list: listFmt(good) };
-    const fair = bandsWith(h, time, 'fair');
-    if (fair.length) return { level: 'ok', list: listFmt(fair) };
-    return { level: 'bad', list: t('sum.none') };
-  }
-
-  function alertsLast24(d) {
-    if (!Array.isArray(d.alerts)) return null;
-    const since = Date.now() - 24 * HOUR;
-    return d.alerts.filter((a) => Date.parse(a.issued) >= since);
-  }
-
-  // Meldungen, die für Funkamateure besonders relevant sind
-  const SERIOUS_ALERT = /K-index of [5-9]|Geomagnetic Storm|X-ray Event exceeded X|Proton Event|Proton Flux/i;
-
-  function vhfOpenLabel(p) {
-    const keys = VHF_LABELS[`${p.name.toLowerCase()}|${p.location.toLowerCase()}`];
-    return keys ? `${t(keys[0])} (${t(keys[1])})` : `${p.name} (${p.location})`;
-  }
-
-  function renderSummary(d) {
-    const list = $('#summary');
-    const h = d.hamqsl;
-    const rows = [];
-
-    if (h && h.bands.length) {
-      const period = qthPeriod();
-      if (!qth) {
-        rows.push({ label: t('sum.now'), level: 'neutral', html: `<a href="#qth-input">${esc(t('sum.nowHint'))}</a>` });
-      } else if (period === 'grey') {
-        rows.push({ label: t('sum.now'), level: 'ok', text: t('sum.nowGrey', { loc: qth.locator }) });
-      } else {
-        const best = bestBands(h, period);
-        rows.push({ label: t('sum.now'), level: best.level, text: t(period === 'day' ? 'sum.nowDay' : 'sum.nowNight', { loc: qth.locator, list: best.list }) });
-      }
-      rows.push(hfRow(h, 'day'), hfRow(h, 'night'));
-    }
-
-    if (h) {
-      const g = rateGeomag(h.geomagField) || rateK(h.kIndex);
-      if (g) {
-        let level = g.level;
-        const parts = [t('sum.geomagText', { state: ratingText(g), k: fmtNum(h.kIndex), a: fmtNum(h.aIndex) })];
-        const today = d.scales?.current?.date || '';
-        const fc = (d.scales?.forecast || []).find((f) => f.date >= today && Number.isFinite(f.G?.scale) && f.G.scale >= 1);
-        if (fc) {
-          parts.push(t('sum.geomagForecast', { g: `G${fc.G.scale} (${scaleWord(fc.G.text)})`, day: fmt.utcDay.format(new Date(`${fc.date}T00:00:00Z`)) }));
-          level = worse(level, fc.G.scale >= 3 ? 'bad' : 'warn');
-        }
-        rows.push({ label: t('sum.geomag'), level, text: parts.join(' · ') });
-      }
-    }
-
-    const R = d.scales?.current?.R;
-    if (R && Number.isFinite(R.scale)) {
-      const cls = d.flares?.currentClass || h?.xray || '–';
-      const parts = [];
-      let level;
-      if (R.scale >= 1) {
-        level = R.scale >= 3 ? 'bad' : 'warn';
-        parts.push(t('sum.flaresActive', { r: `R${R.scale} (${scaleWord(R.text)})`, cls }));
-      } else {
-        level = 'good';
-        parts.push(t('sum.flaresNone', { cls }));
-      }
-      // Stärkster Flare der letzten 24 Stunden aus der GOES-Messreihe (ab M1 = R1)
-      const since = Date.now() - 24 * HOUR;
-      const peak = (Array.isArray(d.xray) ? d.xray : [])
-        .filter((p) => Date.parse(p.t) >= since && p.flux > 0)
-        .reduce((a, b) => (!a || b.flux > a.flux ? b : a), null);
-      if (peak && peak.flux >= 1e-5) {
-        parts.push(t('sum.recentFlare', { cls: fluxToClass(peak.flux), time: utcTime(peak.t) }));
-        level = worse(level, 'ok');
-      }
-      const prob = d.scales.forecast?.[0]?.R?.minorProb;
-      if (Number.isFinite(prob)) parts.push(t('sum.flaresProb', { p: t('pct', { v: prob }) }));
-      rows.push({ label: t('sum.flares'), level, text: parts.join(' · ') });
-    }
-
-    const S = d.scales?.current?.S;
-    if (S && Number.isFinite(S.scale) && S.scale >= 1) {
-      rows.push({ label: t('sum.radiation'), level: S.scale >= 3 ? 'bad' : 'warn', text: t('sum.radiationText', { s: `S${S.scale} (${scaleWord(S.text)})` }) });
-    }
-
-    const speed = d.wind?.latest?.speed?.value ?? h?.solarWind ?? null;
-    const bz = d.mag?.latest?.bz?.value ?? null;
-    const windParts = [];
-    if (Number.isFinite(speed) && speed >= 500) windParts.push(t('sum.windFast', { v: fmtNum(speed) }));
-    if (Number.isFinite(bz) && bz <= -10) windParts.push(t('sum.bzSouth', { v: fmtNum(bz, 1) }));
-    if (windParts.length) rows.push({ label: t('sum.wind'), level: 'warn', text: windParts.join(' · ') });
-
-    if (h?.vhf?.length) {
-      const open = h.vhf.filter((p) => p.condition && !/^band closed$/i.test(p.condition.trim()));
-      rows.push(
-        open.length
-          ? { label: t('sum.vhf'), level: 'good', text: t('sum.vhfOpen', { list: listFmt(open.map(vhfOpenLabel)) }) }
-          : { label: t('sum.vhf'), level: 'neutral', text: t('sum.vhfClosed') },
-      );
-    }
-
-    const recent = alertsLast24(d);
-    if (recent) {
-      const n = recent.length;
-      const serious = recent.some((a) => SERIOUS_ALERT.test(a.headline));
-      const text = n === 0 ? t('sum.alertsNone') : n === 1 ? t('sum.alertsOne') : t('sum.alertsMany', { n });
-      rows.push({
-        label: t('sum.alerts'),
-        level: serious ? 'warn' : 'neutral',
-        html: n ? `${esc(text)} – <a href="#skalen">${esc(t('forecast.title'))}</a>` : esc(text),
-      });
-    }
-
-    if (!rows.length) {
-      list.innerHTML = `<li class="placeholder">${esc(t('sum.unavailable'))}</li>`;
-      return;
-    }
-    list.innerHTML = rows
-      .map(
-        (r) =>
-          `<li class="summary__item summary__item--${r.level}"><span class="summary__label">${esc(r.label)}</span><span class="summary__text">${r.html ?? esc(r.text)}</span></li>`,
-      )
-      .join('');
-  }
-
-  // ------------------------------------------------------------------ NOAA-Meldungen
-
-  const ALERT_LEVEL = { ALERT: 'warn', WARNING: 'warn', 'EXTENDED WARNING': 'warn', 'CONTINUED ALERT': 'warn', WATCH: 'ok', SUMMARY: 'neutral' };
-
-  function renderAlerts(d) {
-    const list = $('#alerts');
-    const items = alertsLast24(d);
-    if (items === null) {
-      list.innerHTML = `<li class="placeholder">${esc(t('alerts.unavailable'))}</li>`;
-      return;
-    }
-    if (!items.length) {
-      list.innerHTML = `<li class="placeholder">${esc(t('alerts.none'))}</li>`;
-      return;
-    }
-    // Geöffnete Volltexte beim Aktualisieren offen lassen
-    const open = new Set([...list.querySelectorAll('details[open]')].map((el) => el.dataset.key));
-    list.innerHTML = items
-      .map((a) => {
-        const key = `${a.code}#${a.serial}`;
-        const head = a.headline || a.code;
-        const colon = head.indexOf(':');
-        const type = colon > 0 ? head.slice(0, colon).trim() : 'INFO';
-        const title = colon > 0 ? head.slice(colon + 1).trim() : head;
-        return `<li class="alert">
-            <div class="alert__meta"><span class="pill pill--${ALERT_LEVEL[type] || 'neutral'}">${esc(type)}</span><span>${esc(utcFull(a.issued))}</span><span class="alert__code">${esc(a.code)}</span></div>
-            <p class="alert__title">${esc(title)}</p>
-            <details data-key="${esc(key)}"${open.has(key) ? ' open' : ''}><summary>${esc(t('alerts.full'))}</summary><pre>${esc(a.message)}</pre></details>
-          </li>`;
-      })
-      .join('');
-  }
-
-  // ------------------------------------------------------------------ 27-Tage-Prognose
-
-  function drawOutlook(o) {
-    const container = $('#chart-outlook');
-    const caption = $('#outlook-caption');
-    if (!o || !Array.isArray(o.days) || !o.days.length) {
-      caption.textContent = t('outlook.caption');
-      return emptyChart(container, t('outlook.unavailable'));
-    }
-    caption.textContent = o.issued ? t('outlook.captionIssued', { date: fmt.utcDay.format(new Date(o.issued)) }) : t('outlook.caption');
-
-    const days = o.days.map((d, i) => ({ ...d, t: i, ms: Date.parse(`${d.date}T00:00:00Z`) }));
-    const f = chartFrame(container, { height: 300, left: 46, top: 24 });
-    const n = days.length;
-    const bw = f.iw / n;
-    const x = (i) => f.left + (i + 0.5) * bw;
-    const gap = 30;
-    const topH = Math.round((f.ih - gap) * 0.58);
-    const botH = f.ih - gap - topH;
-    const topY1 = f.top + topH;
-    const botY0 = topY1 + gap;
-    const botY1 = f.top + f.ih;
-
-    const fluxes = days.map((d) => d.flux);
-    const fMin = Math.floor((Math.min(...fluxes) - 5) / 10) * 10;
-    const fMax = Math.ceil((Math.max(...fluxes) + 5) / 10) * 10;
-    const yF = (v) => topY1 - ((v - fMin) / (fMax - fMin)) * topH;
-    const yK = (v) => botY1 - (v / 9) * botH;
-
-    const g = svgEl('g', {}, f.svg);
-    for (const v of niceTicks(fMin, fMax, 3)) {
-      svgEl('line', { x1: f.left, x2: f.left + f.iw, y1: yF(v), y2: yF(v), class: 'c-grid' }, g);
-      svgEl('text', { x: f.left - 8, y: yF(v) + 4, 'text-anchor': 'end', class: 'c-label' }, g).textContent = fmtNum(v);
-    }
-    svgEl('text', { x: f.left, y: f.top - 8, class: 'c-label c-label--display' }, g).textContent = 'SFI';
-    for (const v of [0, 3, 6, 9]) {
-      svgEl('line', { x1: f.left, x2: f.left + f.iw, y1: yK(v), y2: yK(v), class: v === 0 ? 'c-axis' : 'c-grid' }, g);
-      svgEl('text', { x: f.left - 8, y: yK(v) + 4, 'text-anchor': 'end', class: 'c-label' }, g).textContent = v;
-    }
-    svgEl('text', { x: f.left, y: botY0 - 8, class: 'c-label c-label--display' }, g).textContent = 'Kp';
-
-    const barW = Math.max(1, bw - (bw > 8 ? 3 : 1));
-    for (const d of days) {
-      if (d.kp === null) continue;
-      const top = yK(Math.max(d.kp, 0.15));
-      svgEl('rect', { x: (x(d.t) - barW / 2).toFixed(1), y: top.toFixed(1), width: barW.toFixed(1), height: (botY1 - top).toFixed(1), class: `c-bar c-bar--${kpLevel(d.kp)}${bw < 6 ? ' c-bar--thin' : ''}` }, f.svg);
-    }
-
-    svgEl('path', { d: days.map((d, i) => `${i ? 'L' : 'M'}${x(d.t).toFixed(1)},${yF(d.flux).toFixed(1)}`).join(''), class: 'c-line' }, f.svg);
-    if (bw >= 10) for (const d of days) svgEl('circle', { cx: x(d.t), cy: yF(d.flux), r: 2.5, class: 'c-point' }, f.svg);
-
-    const every = Math.max(1, Math.ceil(64 / bw));
-    for (const d of days) {
-      if (d.t % every !== 0) continue;
-      svgEl('text', { x: x(d.t), y: botY1 + 20, 'text-anchor': 'middle', class: 'c-label' }, f.svg).textContent = fmt.utcDayMonth.format(new Date(d.ms));
-    }
-
-    const todayIdx = days.findIndex((d) => d.date === new Date().toISOString().slice(0, 10));
-    if (todayIdx >= 0) {
-      svgEl('line', { x1: x(todayIdx), x2: x(todayIdx), y1: f.top, y2: botY1, class: 'c-now' }, f.svg);
-      svgEl('text', { x: x(todayIdx) + 5, y: f.top + 12, class: 'c-label c-label--display' }, f.svg).textContent = t('cycle.now');
-    }
-
-    attachHover(container, f, days, x, {
-      focusY: (p) => yF(p.flux),
-      describe: (p) =>
-        `<strong>${esc(fmt.utcDay.format(new Date(p.ms)))}</strong>${esc(t('outlook.tip', { f: fmtNum(p.flux), a: fmtNum(p.ap), k: p.kp === null ? '–' : fmtNum(p.kp) }))}`,
-    });
-  }
-
-  // ------------------------------------------------------------------ Sonnenzyklus
-
-  const monthMs = (ym) => {
-    const [yy, mm] = ym.split('-').map(Number);
-    return Date.UTC(yy, mm - 1, 15);
-  };
-
-  function drawCycle(obs, pred) {
-    const container = $('#chart-cycle');
-    if (!Array.isArray(obs) || !obs.length) return emptyChart(container, t('cycle.unavailable'));
-    const byMonth = new Map();
-    for (const o of obs) byMonth.set(o.t, { t: monthMs(o.t), ssn: o.ssn, smoothed: o.smoothed });
-    for (const p of Array.isArray(pred) ? pred : []) {
-      const e = byMonth.get(p.t) || { t: monthMs(p.t) };
-      Object.assign(e, { pred: p.ssn, low: p.low, high: p.high });
-      byMonth.set(p.t, e);
-    }
-    const points = [...byMonth.values()].sort((a, b) => a.t - b.t);
-    const f = chartFrame(container, { height: 280, left: 40 });
-    const t0 = points[0].t;
-    const t1 = points[points.length - 1].t;
-    const x = (ms) => f.left + ((ms - t0) / (t1 - t0)) * f.iw;
-    const maxV = Math.max(...points.flatMap((p) => [p.ssn, p.smoothed, p.high].filter(Number.isFinite)));
-    const yMax = Math.ceil((maxV * 1.08) / 50) * 50;
-    const y = (v) => f.top + f.ih - (v / yMax) * f.ih;
-
-    const g = svgEl('g', {}, f.svg);
-    for (const v of niceTicks(0, yMax, 5)) {
-      svgEl('line', { x1: f.left, x2: f.left + f.iw, y1: y(v), y2: y(v), class: 'c-grid' }, g);
-      svgEl('text', { x: f.left - 8, y: y(v) + 4, 'text-anchor': 'end', class: 'c-label' }, g).textContent = fmtNum(v);
-    }
-    const step = f.iw < 520 ? 4 : 2;
-    const y0 = new Date(t0).getUTCFullYear();
-    const y1 = new Date(t1).getUTCFullYear();
-    for (let yr = Math.ceil(y0 / step) * step; yr <= y1; yr += step) {
-      const ms = Date.UTC(yr, 0, 1);
-      if (ms < t0) continue;
-      svgEl('line', { x1: x(ms), x2: x(ms), y1: f.top, y2: f.top + f.ih, class: 'c-grid' }, g);
-      svgEl('text', { x: x(ms), y: f.top + f.ih + 20, 'text-anchor': 'middle', class: 'c-label' }, g).textContent = yr;
-    }
-    svgEl('line', { x1: f.left, x2: f.left + f.iw, y1: f.top + f.ih, y2: f.top + f.ih, class: 'c-axis' }, g);
-
-    const band = points.filter((p) => Number.isFinite(p.low) && Number.isFinite(p.high));
-    if (band.length > 1) {
-      const upper = band.map((p, i) => `${i ? 'L' : 'M'}${x(p.t).toFixed(1)},${y(p.high).toFixed(1)}`).join('');
-      const lower = [...band].reverse().map((p) => `L${x(p.t).toFixed(1)},${y(p.low).toFixed(1)}`).join('');
-      svgEl('path', { d: `${upper}${lower}Z`, class: 'c-area c-area--pred' }, f.svg);
-    }
-    const gapMs = 45 * 24 * HOUR;
-    svgEl('path', { d: linePath(points, x, y, 'ssn', gapMs), class: 'c-line c-line--muted' }, f.svg);
-    svgEl('path', { d: linePath(points, x, y, 'pred', gapMs), class: 'c-line c-line--pred' }, f.svg);
-    svgEl('path', { d: linePath(points, x, y, 'smoothed', gapMs), class: 'c-line' }, f.svg);
-
-    const now = Date.now();
-    if (now > t0 && now < t1) {
-      svgEl('line', { x1: x(now), x2: x(now), y1: f.top, y2: f.top + f.ih, class: 'c-now' }, f.svg);
-      svgEl('text', { x: x(now) + 5, y: f.top + 12, class: 'c-label c-label--display' }, f.svg).textContent = t('cycle.now');
-    }
-
-    attachHover(container, f, points, x, {
-      focusY: (p) => {
-        const v = p.smoothed ?? p.ssn ?? p.pred;
-        return Number.isFinite(v) ? y(v) : null;
-      },
-      describe: (p) => {
-        const lines = [];
-        if (Number.isFinite(p.ssn)) lines.push(t('cycle.tipObs', { v: fmtNum(p.ssn, 1) }));
-        if (Number.isFinite(p.smoothed)) lines.push(t('cycle.tipSmooth', { v: fmtNum(p.smoothed, 1) }));
-        if (Number.isFinite(p.pred)) lines.push(t('cycle.tipPred', { v: fmtNum(p.pred, 1), lo: fmtNum(p.low, 1), hi: fmtNum(p.high, 1) }));
-        return `<strong>${esc(fmt.utcMonth.format(new Date(p.t)))}</strong>${lines.map(esc).join('<br>')}`;
-      },
-    });
-  }
-
-  // ------------------------------------------------------------------ Greyline-Karte
-
-  let worldPath = null;
-  const shade = document.createElement('canvas');
-  shade.width = 360;
-  shade.height = 180;
-
-  async function loadWorld() {
-    try {
-      const res = await fetch('world-110m.json');
-      if (!res.ok) throw new Error(`HTTP ${res.status}`);
-      worldPath = new Path2D((await res.json()).d);
-    } catch (err) {
-      console.error('Weltkarte', err);
-    }
-    drawMap();
-  }
-
-  // Ein Pixel pro Grad: Tag durchsichtig, Dämmerung gelb, Nacht dunkel (tiefer = dunkler)
-  function paintShade(pos) {
-    const ctx = shade.getContext('2d');
-    const img = ctx.createImageData(360, 180);
-    const px = img.data;
-    const sd = Math.sin(pos.dec * RAD);
-    const cd = Math.cos(pos.dec * RAD);
-    const cosH = new Float64Array(360);
-    for (let i = 0; i < 360; i++) cosH[i] = Math.cos((-179.5 + i - pos.subLon) * RAD);
-    for (let j = 0; j < 180; j++) {
-      const lat = (89.5 - j) * RAD;
-      const a = Math.sin(lat) * sd;
-      const b = Math.cos(lat) * cd;
-      for (let i = 0; i < 360; i++) {
-        const el = Math.asin(Math.max(-1, Math.min(1, a + b * cosH[i]))) * DEG;
-        const k = (j * 360 + i) * 4;
-        if (el >= -0.833) continue;
-        if (el >= -6) {
-          px[k] = 255;
-          px[k + 1] = 210;
-          px[k + 2] = 0;
-          px[k + 3] = 165;
-        } else {
-          px[k] = 20;
-          px[k + 1] = 20;
-          px[k + 2] = 20;
-          px[k + 3] = Math.round(95 + Math.min(1, (-6 - el) / 12) * 75);
-        }
-      }
-    }
-    ctx.putImageData(img, 0, 0);
-  }
-
-  function drawMap() {
-    const canvas = $('#map-canvas');
-    const box = $('#map');
-    if (!canvas || !box) return;
-    const now = Date.now();
-    $('#map-intro').textContent = t('map.intro', { time: fmt.utcTime.format(new Date(now)) });
-    const dpr = Math.min(2, window.devicePixelRatio || 1);
-    const w = Math.max(280, Math.floor(box.clientWidth));
-    const cw = Math.round(w * dpr);
-    const ch = Math.round(cw / 2);
-    if (canvas.width !== cw || canvas.height !== ch) {
-      canvas.width = cw;
-      canvas.height = ch;
-    }
-    const ctx = canvas.getContext('2d');
-    const sx = cw / 360;
-    const sy = ch / 180;
-
-    ctx.setTransform(1, 0, 0, 1, 0, 0);
-    ctx.fillStyle = '#82dce1';
-    ctx.fillRect(0, 0, cw, ch);
-
-    ctx.setTransform(sx, 0, 0, sy, 0, 0);
-    if (worldPath) {
-      ctx.fillStyle = '#ffffff';
-      ctx.fill(worldPath);
-      ctx.lineWidth = (0.8 * dpr) / sx;
-      ctx.strokeStyle = 'rgba(36, 36, 36, 0.6)';
-      ctx.stroke(worldPath);
-    }
-    ctx.lineWidth = dpr / sx;
-    ctx.strokeStyle = 'rgba(36, 36, 36, 0.18)';
-    ctx.beginPath();
-    for (let lon = -150; lon <= 150; lon += 30) {
-      ctx.moveTo(lon + 180, 0);
-      ctx.lineTo(lon + 180, 180);
-    }
-    for (let lat = -60; lat <= 60; lat += 30) {
-      ctx.moveTo(0, 90 - lat);
-      ctx.lineTo(360, 90 - lat);
-    }
-    ctx.stroke();
-
-    const pos = Geo.sunPosition(now);
-    paintShade(pos);
-    ctx.imageSmoothingEnabled = true;
-    ctx.imageSmoothingQuality = 'high';
-    ctx.drawImage(shade, 0, 0, 360, 180);
-
-    ctx.setTransform(1, 0, 0, 1, 0, 0);
-    const px = (lon) => (lon + 180) * sx;
-    const py = (lat) => (90 - lat) * sy;
-    ctx.beginPath();
-    ctx.arc(px(pos.subLon), py(pos.dec), 8 * dpr, 0, 2 * Math.PI);
-    ctx.fillStyle = '#ffd200';
-    ctx.fill();
-    ctx.lineWidth = 2 * dpr;
-    ctx.strokeStyle = '#242424';
-    ctx.stroke();
-
-    if (qth) {
-      const qx = px(qth.lon);
-      const qy = py(qth.lat);
-      ctx.beginPath();
-      ctx.arc(qx, qy, 6 * dpr, 0, 2 * Math.PI);
-      ctx.fillStyle = '#fe0000';
-      ctx.fill();
-      ctx.lineWidth = 2 * dpr;
-      ctx.strokeStyle = '#ffffff';
-      ctx.stroke();
-      ctx.font = `${13 * dpr}px Figtree, Arial, sans-serif`;
-      const label = qth.locator;
-      const tw = ctx.measureText(label).width;
-      const pad = 4 * dpr;
-      let lx = qx + 10 * dpr;
-      if (lx + tw + 2 * pad > cw) lx = qx - 10 * dpr - tw - 2 * pad;
-      const ly = Math.max(pad, Math.min(ch - 18 * dpr - pad, qy - 9 * dpr));
-      ctx.fillStyle = '#242424';
-      ctx.fillRect(lx, ly, tw + 2 * pad, 18 * dpr);
-      ctx.fillStyle = '#ffffff';
-      ctx.textBaseline = 'middle';
-      ctx.fillText(label, lx + pad, ly + 9 * dpr);
-    }
-  }
-
-  function placeTooltip(tip, ev) {
-    const tw = tip.offsetWidth;
-    const th = tip.offsetHeight;
-    let left = ev.clientX + 14;
-    if (left + tw > window.innerWidth - 8) left = ev.clientX - tw - 14;
-    let top = ev.clientY - th - 12;
-    if (top < 8) top = ev.clientY + 16;
-    tip.style.left = `${Math.max(8, left)}px`;
-    tip.style.top = `${top}px`;
-  }
-
-  function setupMap() {
-    const canvas = $('#map-canvas');
-    const tip = $('#tooltip');
-    const move = (ev) => {
-      const r = canvas.getBoundingClientRect();
-      const lon = ((ev.clientX - r.left) / r.width) * 360 - 180;
-      const lat = 90 - ((ev.clientY - r.top) / r.height) * 180;
-      if (lon < -180 || lon > 180 || lat < -90 || lat > 90) {
-        tip.hidden = true;
-        return;
-      }
-      const el = Geo.sunElevation(lat, lon, Date.now());
-      tip.innerHTML = `<strong>${esc(Geo.latLonToLocator(lat, lon))}</strong>${esc(fmtCoord(lat, lon, 1))}<br>${esc(t('map.tipSun', { el: fmtNum(el, 0), state: t(`sun.${sunState(el)}`) }))}`;
-      tip.hidden = false;
-      placeTooltip(tip, ev);
-    };
-    canvas.addEventListener('pointermove', move);
-    canvas.addEventListener('pointerdown', move);
-    canvas.addEventListener('pointerleave', () => {
-      tip.hidden = true;
-    });
-  }
-
-  // Jede Minute: Karte, Sonnenstand am Standort und «Jetzt»-Zeile nachführen
-  function minuteTick() {
-    drawMap();
-    renderQth();
-    if (state) {
-      for (const step of [renderSummary, renderBands]) {
-        try {
-          step(state);
-        } catch (err) {
-          console.error(err);
-        }
       }
     }
   }
@@ -1665,7 +998,7 @@
       if (lastFetchError) showFetchError(lastFetchError);
       return;
     }
-    for (const step of [renderStatus, renderSummary, renderIndices, renderBands, renderVhf, renderScales, renderAlerts, renderGallery]) {
+    for (const step of [renderStatus, renderIndices, renderBands, renderVhf, renderScales, renderGallery]) {
       try {
         step(state);
       } catch (err) {
@@ -1684,8 +1017,6 @@
     fmt = makeFormats();
     applyStatic();
     renderAll();
-    renderQth();
-    drawMap();
   }
 
   // ------------------------------------------------------------------ Laden
@@ -1744,13 +1075,8 @@
   $('#year').textContent = String(new Date().getFullYear());
   setupNav();
   setupLightbox();
-  setupQth();
-  setupMap();
-  renderQth();
-  loadWorld();
   load();
   setInterval(load, REFRESH_MS);
-  setInterval(minuteTick, 60 * 1000);
   document.addEventListener('visibilitychange', () => {
     if (document.visibilityState === 'visible' && Date.now() - lastLoad > REFRESH_MS) load();
   });
@@ -1763,7 +1089,6 @@
       if (window.innerWidth !== lastWidth) {
         lastWidth = window.innerWidth;
         drawCharts();
-        drawMap();
       }
     }, 150);
   });
