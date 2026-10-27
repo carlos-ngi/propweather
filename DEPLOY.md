@@ -71,30 +71,12 @@ Container auswählen → **Console** → als `root` anmelden.
 apt update && apt full-upgrade -y && apt install -y git
 ```
 
-### 2.2 Zugang zum privaten GitHub-Repository
-
-Der Server bekommt einen eigenen Schlüssel, der das Repository **nur lesen** darf:
+### 2.2 Code holen und installieren
 
 ```bash
-ssh-keygen -t ed25519 -f /root/.ssh/propweather_deploy -N "" -C "proxmox-propweather"
-cat /root/.ssh/propweather_deploy.pub
-```
-
-Die ausgegebene Zeile (beginnt mit `ssh-ed25519`) kopieren und auf GitHub eintragen:
-<https://github.com/carlos-ngi/propweather/settings/keys> → **Add deploy key** → Titel `proxmox` →
-Zeile einfügen → **«Allow write access» NICHT ankreuzen** → **Add key**.
-
-### 2.3 Code holen und installieren
-
-```bash
-GIT_SSH_COMMAND="ssh -i /root/.ssh/propweather_deploy -o IdentitiesOnly=yes" git clone git@github.com:carlos-ngi/propweather.git /opt/propweather
+git clone https://github.com/carlos-ngi/propweather.git /opt/propweather
 bash /opt/propweather/deploy/install.sh
 ```
-
-Beim ersten Verbinden fragt SSH, ob du github.com vertraust. Der Fingerabdruck muss
-`SHA256:+DiY3wvvV6TuJJhbpZisF/zLDA0zPMSvHdkr4UvCOqU` lauten (Quelle:
-[GitHub Docs](https://docs.github.com/en/authentication/keeping-your-account-and-data-secure/githubs-ssh-key-fingerprints)) –
-dann `yes` eingeben.
 
 Das Skript installiert Node.js, schaltet automatische Sicherheitsupdates ein, legt den
 Benutzer `propweather` ohne Login an, setzt die Rechte, richtet den abgesicherten Dienst ein und
@@ -185,7 +167,7 @@ deiner persönlichen Adresse aus.
 
 ### Neue Version einspielen
 
-Nachdem Änderungen auf GitHub gepusht wurden, in der Container-Konsole:
+Um die neueste Version von GitHub zu übernehmen, in der Container-Konsole:
 
 ```bash
 bash /opt/propweather/deploy/update.sh

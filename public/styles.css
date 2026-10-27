@@ -590,6 +590,7 @@ html.has-dialog { overflow: hidden; }
 
 .site-footer__links { display: flex; flex-wrap: wrap; gap: 6px 22px; }
 .site-footer--legal .site-footer__bottom { margin-top: 0; }
+.site-footer p.site-footer__oss { flex-basis: 100%; margin: 0; font-size: .95rem; }
 
 /* ---------------------------------------------------------------- Impressum / Datenschutz */
 

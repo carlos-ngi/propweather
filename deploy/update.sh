@@ -16,7 +16,12 @@ fi
 
 cd "$APP_DIR"
 echo "==> Neueste Version holen"
-GIT_SSH_COMMAND="ssh -i $KEY -o IdentitiesOnly=yes" git pull --ff-only
+# Deploy-Key nur verwenden, wenn vorhanden (Klon per SSH); ein Klon per HTTPS braucht keinen.
+if [[ -f $KEY ]]; then
+  GIT_SSH_COMMAND="ssh -i $KEY -o IdentitiesOnly=yes" git pull --ff-only
+else
+  git pull --ff-only
+fi
 
 echo "==> Rechte setzen"
 chown -R root:"$APP_USER" "$APP_DIR"

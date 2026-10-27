@@ -91,4 +91,9 @@ und die Seite weist darauf hin. Bilder, die älter als 6 Stunden sind, werden al
 - Schriften: [League Gothic](https://github.com/theleagueof/league-gothic) und
   [Figtree](https://github.com/erikdkennedy/figtree), SIL Open Font License 1.1
 
+## Lizenz
+
+Der Code steht unter der [MIT-Lizenz](LICENSE). Die Schriften in `public/fonts/` stehen unter der
+SIL Open Font License 1.1 (siehe die Lizenzdateien dort).
+
 Alle Angaben ohne Gewähr.
